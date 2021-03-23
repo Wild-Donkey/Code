@@ -43,7 +43,7 @@ bool b[3005];
 inline void Clr() {}
 int main() {
   // double Ti(clock()), Mti(0);
-//   freopen("P4767_3.in", "r", stdin);
+  // freopen(".in", "r", stdin);
 //   freopen("P4767_NOClear.out", "w", stdout);
 //  t = RD();
 //  for (register unsigned T(1); T <= t; ++T){
@@ -55,9 +55,9 @@ int main() {
   }
 //  memset(g, 0x3f, sizeof(g));
 //  g[0][0] = 0x3f3f3f3f;
-//  Dec[0][1] = 0;
   for (register unsigned i(1); i <= n; ++i) {
     g[1][i] = 0;
+//    g[0][i] = 0x3f3f3f3f;
   }
   for (register unsigned i(1); i <= n; ++i) {
     for (register unsigned j(i + 1); j <= n; ++j) {
@@ -68,11 +68,9 @@ int main() {
   f[0][0] = 0;
   for (register unsigned i(1); i <= n; ++i) {
 //    printf("Case %u ", i);
-    Dec[i][min(i, m) + 1] = 0x3f3f3f3f; // 对于本轮DP, Dec[i][min(i, m) + 1] 是状态 (i, min(i, m)) 可行决策的右边界 
-    for (register unsigned j(min(i, m)); j >= 1; --j) {
-      unsigned Mxn(min(i - 1, Dec[i][j + 1]));  // 右边界 
-//      printf("[%u %u]", Dec[i - 1][j], Mxn);
-      for (register unsigned k(Dec[i - 1][j])/*左边界*/; k <= Mxn; ++k) {
+    unsigned Mxnm(min(i, m));
+    for (register unsigned j(1); j <= Mxnm; ++j) {
+      for (register unsigned k(max(Dec[i - 1][j], Dec[i][j - 1])); k < i; ++k) {
         if(f[k][j - 1] + g[k + 1][i] < f[i][j]) {
 //          f[i][j] = f[k][j - 1] + g[i - k][k + 1];
           f[i][j] = f[k][j - 1] + g[k + 1][i];
@@ -82,7 +80,6 @@ int main() {
 //      printf("f[%u][%u]=%udes%u     ", i, j, f[i][j], Dec[i][j]);
 //      printf("%3u", Dec[i][j]);
     }
-    Dec[i][min(i, m) + 1] = 0;  // 对于下一轮, Dec[i][min(i, m) + 1] 是状态 (i + 1, min(i, m)) 的左边界 
 //    putchar('\n');
   }
   printf("%u\n", f[n][m]);
