@@ -44,6 +44,7 @@ int main() {
   // freopen(".in","r",stdin);
   // freopen(".out","w",stdout);
   n = RD();
+  
   m = RD();
   for (register int i(1); i <= n; ++i) {
     cin.getline(s, 16);

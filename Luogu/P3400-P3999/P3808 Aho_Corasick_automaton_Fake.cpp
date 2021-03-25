@@ -39,16 +39,16 @@ inline int RDsg() {
   return rdtp * rdsg;
 }
 unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
-bool flg(0);
-char inch; 
+bool b[10005];
+char inch;
 inline void Clr() {}
 struct Node {
-  Node *Son[26];
+  Node *Son[26], *Fa, *Fail;
   unsigned Val;
-}N[500005], *Cntn(N), *now(N);
+}N[1000005], *now(N), *Cntn(N), *Find(N);
 int main() {
   // double Ti(clock()), Mti(0);
-  // freopen(".in", "r", stdin);
+   freopen("P3808_2.in", "r", stdin);
   // freopen(".out", "w", stdout);
 //  t = RD();
 //  for (register unsigned T(1); T <= t; ++T){
@@ -63,48 +63,40 @@ int main() {
       inch -= 'a';
       if(!(now->Son[inch])) {
         now->Son[inch] = ++Cntn;
+        Cntn->Fail = N;
+        Cntn->Fa = now;
       }
       now = now->Son[inch];
-      inch = getchar();
-    }
-    now->Val = 1;
-  }
-  n = RD();
-  for (register unsigned i(1); i <= n; ++i) {
-    while (inch < 'a' || inch > 'z') {
-      inch = getchar();
-    }
-    now = N;
-    while (inch >= 'a' && inch <= 'z') {
-      inch -= 'a';
-      if(now->Son[inch]) {
-        now = now->Son[inch];
-        inch = getchar();
-      }
-      else {
-        flg = 1;
-        inch += 'a';
-        while (inch >= 'a' && inch <= 'z') {
-          inch = getchar();
+      Find = now->Fa->Fail; 
+      while (Find) {
+        if(Find->Son[inch]) {
+          now->Fail = Find->Son[inch];
+          break;
         }
+        Find = Find->Fail;
       }
+      inch = getchar();
     }
-    if(flg) {
-      flg = 0;
-      printf("WRONG\n");
-      continue;
-    }
-    if(!(now->Val)) {
-      printf("WRONG\n");
-      continue;
-    }
-    if(now->Val >= 2) {
-      printf("REPEAT\n");
-      continue;
-    }
-    printf("OK\n"); 
     ++(now->Val);
   }
+  while (inch < 'a' || inch > 'z') {
+    inch = getchar();
+  }
+  now = N;
+  while (inch >= 'a' && inch <= 'z') {
+    inch -= 'a';
+    while(now) {
+      if(now->Son[inch]) {
+        now = now->Son[inch];
+        Ans += now->Val;
+        now->Val = 0;
+        break;
+      }
+      now = now->Fail;
+    }
+    inch = getchar();
+  }
+  printf("%u\n", Ans);
 //  }
   // Ti = clock() - Ti;
   // printf("Time %lf MTime %lf\n", Ti, Mti);
