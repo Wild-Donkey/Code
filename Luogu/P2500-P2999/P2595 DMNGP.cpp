@@ -37,34 +37,39 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned int f[16][33000], m, n, Cnt(0), A, B, C, D, t;
-bool a[16][16];
+unsigned f[16][1000][1000], a[16], Origin[30005][16], m, n, Cnt(0), A, B, C, D, t, N, M;
 char s[17];
 int main() {
   // freopen(".in","r",stdin);
   // freopen(".out","w",stdout);
   n = RD();
-  
   m = RD();
-  for (register int i(1); i <= n; ++i) {
+  M = (1 << M) - 1;
+  N = M >> 1;
+  for (register unsigned i(1); i <= n; ++i) {
     cin.getline(s, 16);
-    for (register int j(1); j <= m; ++j) {//init
-      if (s[j - 1] == '.') {
-        a[i][j] = 0;
-      } else {
-        a[i][j] = 1;
+    a[i] <<= 1;
+    for (register unsigned j(1); j <= m; ++j) {//init
+      if (s[j - 1] != '.') {
+        a[i] += 1;
+      } 
+    }
+  }
+  for (register unsigned i(1); i <= n; ++i) {//line
+    printf("%u %u\n", i, a[i]);
+  }
+  for (register unsigned i(0); i <= N; ++i) {
+    for (register unsigned j(0); j + 1 < m; ++j) {
+      if(i & (1 << j)) {
+        Origin[i][++Origin[i][0]] = i ^ (1 << j);
+        printf("%u %u\n", i, Origin[i][Origin[i][0]]);
       }
     }
   }
-  for (register int i(1); i <= n; ++i) {//line
-    for (register int j(1); j <= m; ++j) {
-      printf("%u", int(a[i][j]));
-    }
-    putchar('\n');
-  }
-  for (register int i(1); i <= n; ++i) {
-    for (register int j(0); j < 1 << m; ++j) {
-      for (register int k(1); k <= m; ++k) {
+  for (register unsigned i(1); i <= n; ++i) {
+    for (register int j(0); j <= M; ++j) {
+      for (register int k(1); k <= N; ++k) {
+        
       }
     }
   }
