@@ -36,23 +36,23 @@ int main() {
     while (Character != 's' && Character != 'e') {
       Character = getchar();
     }
-    if(Character == 's') {
+    if(Character == 's') {                      // 上括号 
       a[i].SE = 1;
     }
-    else {
+    else {                                      // 下括号 
       a[i].SE = -1;
     }
     a[i].Number = RD();
-    if(!Lend[a[i].Number]) {
-      Lend[a[i].Number] = 1;
-      List[++Cnt] = a[i].Number;
+    if(!Lend[a[i].Number]) {                    // 这个编号的基因首次出现
+      Lend[a[i].Number] = 1;                    // 打标记表示这个编号的基因出现过 
+      List[++Cnt] = a[i].Number;                // 记录在基因列表中 
     }
   }
   Pos = 1;
-  memset(Lend, 0x3f, sizeof(Lend));           //
+  memset(Lend, 0x3f, sizeof(Lend));             // Lend 这时改变身份, 记录 
   for (register unsigned i(1); i <= n; ++i) {
-    Sum[a[i].Number] += a[i].SE;
-    Lend[a[i].Number] = min(Lend[a[i].Number], Sum[a[i].Number]);
+    Sum[a[i].Number] += a[i].SE;                // 累计总和 
+    Lend[a[i].Number] = min(Lend[a[i].Number], Sum[a[i].Number]); // 更新前缀和历史最小值 
   }
   for (register unsigned i(1); i <= Cnt; ++i) {
     if(Lend[List[i]] == 0 && Sum[List[i]] == 0) {
