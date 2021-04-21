@@ -38,10 +38,109 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned n, Ans(0), Tmp(0), LMS[1000005], CntLMS(0), S[1500005], SA[1500005], Bucket[105], SumBucket[105], Address[1500005];
-char Type[1000005];
-void Induced_Sort (unsigned SL, unsigned SR) {  // 通过 S 求 SA 
-  for (register unsigned i(SL), j(SL); i <= SR; ++i) {   // 定性 
+unsigned Cnt(0), n, Ans(0), Tmp(0), S[2000005], SA[2000005], BucketPool[500005], SumBucketPool[500005], Address[2000005], S_S1[2000005];
+char Type[1000005], IfLMS[2000005];
+void Print(unsigned L, unsigned R) {
+  printf("Address[%u, %u]\n", L, R);
+  for (register unsigned i(L); i <= R; ++i) {
+    printf("%3u", i);
+  }
+  putchar('\n');
+  printf("S[%u, %u]\n", L, R);
+  for (register unsigned i(L); i <= R; ++i) {
+    printf("%3u", S[i]);
+  }
+  putchar('\n');
+  printf("SA[%u, %u]\n", L, R);
+  for (register unsigned i(L); i <= R; ++i) {
+    printf("%3u", SA[i]);
+  }
+  putchar('\n');
+  printf("IfLMS[%u, %u]\n", L, R);
+  for (register unsigned i(L); i <= R; ++i) {
+    printf("%3u", IfLMS[i]);
+  }
+  putchar('\n');
+  putchar('\n');
+  putchar('\n');
+  return;
+}
+inline char Equal (unsigned x, unsigned y) {
+  printf("Compare %u %u\n", x, y);
+  if(S[x] ^ S[y]) {
+    return 0;
+  }
+  while (!(IfLMS[++x] || IfLMS[++y])) {
+    if(S[x] ^ S[y]) {
+      printf("%u %u %u %u\n", x, y, S[x], S[y]);
+      return 0;
+    }
+  }
+  if(IfLMS[x] ^ IfLMS[y]) {
+    return 0;
+  }
+  printf("Equal!!\n");
+  return 1;
+}
+void Induc (unsigned SL, unsigned SR, unsigned *Bucket, unsigned *SumBucket);// 诱导 SA
+void Induced_Sort (unsigned SL, unsigned SR, unsigned* Bucket, unsigned *SumBucket, unsigned bucketSize, unsigned LMSR) {// 通过 S 求 SA
+  printf("Induced_Sort %u %u %u %u\n", SL, SR, bucketSize, LMSR);
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {// 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(LMSR); i > SR; --i) {// 放长度为 1 的 LMS 前缀 
+    SA[SumBucket[S[Address[i]]]--] = Address[i];
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(SL); i <= SR; ++i) {         // 从左到右扫 SA 数组 
+    if(SA[i]) {
+      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
+        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
+      }
+    }
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(SR); i >= SL; --i) {         // 从右往左扫 SA 数组 
+    if(SA[i]) {
+      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
+        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
+      }
+    }
+  }
+  Print(SL, SR);
+  register char flg(0);
+  register unsigned CntLMS(0)/**/, Pre(SR), Pointer(SR + 1);
+  for (register unsigned i(SL + 1); i <= SR; ++i) {         // 扫描找出 LMS, 判重并命名 
+    if(IfLMS[SA[i]]) {
+      if(Equal(i, Pre)) {                                   // 暴力判重 
+        S[S_S1[SA[i]]] = CntLMS;                            // 命名 
+        flg = 1;
+      }
+      else {
+        S[S_S1[SA[i]]] = ++CntLMS;                          // 命名 
+      }
+      Pre = SA[i];                                          // 用来判重 
+      SA[++Pointer] = S_S1[SA[i]];                                  // 记录 LMS 
+    }
+  }
+  S[CntLMS] = 0;
+  SA[SR + 1] = LMSR;
+  if(flg) {//排序 LMS 子串, 返回是否重复 
+    Induc(SR + 1, LMSR, Bucket + bucketSize + 1, SumBucket + bucketSize + 1); //有重复, 先诱导 SA1, 新的 Bucket 直接接在后面 
+  }
+  Print(SR + 1, LMSR);
+  return;//这时保证 SA1 是对的 
+}
+void Induc (unsigned SL, unsigned SR, unsigned *Bucket, unsigned *SumBucket) {// 诱导 SA
+  printf("Induc %u %u %u %u\n", SL, SR, Bucket - BucketPool, SumBucket - SumBucketPool);
+  for (register unsigned i(SL), j(SL); i < SR; ++i) {    // 定性
     if(S[i] < S[i + 1]) { // Suff[j~i] 是 S-Type 
       while (j <= i) {
         Type[j++] = 1;
@@ -53,34 +152,50 @@ void Induced_Sort (unsigned SL, unsigned SR) {  // 通过 S 求 SA
       }
     }
   }
-  Type[n + 1] = 1;
-  LMS = SR;
-  for (register unsigned i(SL); i <= SR; ++i) {         // 找 LMS 
+  Type[SR] = 1;
+  register unsigned CntLMS(SR);
+  for (register unsigned i(SL); i < SR; ++i) {         // 找 LMS, 记录在 S 中地址, 统计 LMSR 
     if(!Type[i]) {
       if(Type[i + 1]) {
-        S[++CntLMS] = i + 1;
-//        printf("%3u", LMS[CntLMS]);
+        Address[++CntLMS] = i + 1;
+        S_S1[i + 1] = CntLMS;
+        IfLMS[i + 1] = 1;
       }
     }
   }
-  for (register unsigned i(1); i <= n; ++i) {         // 确定 Bucket
+  register unsigned bucketSize(0);
+  for (register unsigned i(SL); i <= SR; ++i) {         // 确定 Bucket
     ++Bucket[S[i]];
+    bucketSize = bucketSize < S[i] ? S[i] : bucketSize; // 统计 Bucket 的空间范围 
+  }
+  Induced_Sort(SL, SR, Bucket, SumBucket, bucketSize, CntLMS);// 诱导排序 LMS 子串 
+  SumBucket[0] = 1;                                     // SA1 求出来了, 开始诱导 
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(SR + 1); i <= CntLMS; ++i) {      // 放长度为 1 的 LMS 前缀 
+    printf("Excuse me?%u\n", i);
+    SA[SumBucket[S[Address[SA[i]]]]--] = Address[SA[i]];
   }
   SumBucket[0] = 1;
-  for (register unsigned i(1); i <= 64; ++i) {        // 求 Bucket 前缀和, 对每个首字符存储 S 型后缀的右端点指针 
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
     SumBucket[i] = SumBucket[i - 1] + Bucket[i];
   }
-  for (register unsigned i(SR); i <= CntLMS; ++i) {    // 放 LMS 后缀 
-    SA[--SumBucket[S[Address[S_[i]]]]] = Address[S_[i]];
-  }
-  SumBucket[0][1] = 1;
-  for (register unsigned i(1); i <= 64; ++i) {        // 对每个首字符存储 L 型后缀的左端点指针 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-  }
-  for (register unsigned i(SL); i <= SR; ++i) {         // 扫 
+  for (register unsigned i(SL); i <= SR; ++i) {         // 从左到右扫 SA 数组 
     if(SA[i]) {
-      if(!Type[SA[i] - 1]) {
-        SA[++]
+      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
+        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
+      }
+    }
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(SR); i >= SL; --i) {         // 从右往左扫 SA 数组 
+    if(SA[i]) {
+      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
+        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
       }
     }
   }
@@ -107,19 +222,15 @@ int main() {
       S[i] = Type[i] - 59;
       continue;
     }
-    n = i - 1;
+    n = i;
     break;
   }
-  S[n + 1] = 0;
-  for (register unsigned i(1); i <= n + 1;  ++i) {
-    
+  printf("%u\n", n);
+  S[n] = 0;
+  Induc (1, n, BucketPool, SumBucketPool);
+  for (register unsigned i(1); i <= n; ++i) {
+    printf("%u ", SA[i]);
   }
-  Induced_Sort(1, n + 1);
-//  for (register unsigned i(1)) {
-//    Address[S_[i]] = LMS;
-//  }
-//  printf("%s\n", a);
-//  }
   // Ti = clock() - Ti;
   // printf("Time %lf MTime %lf\n", Ti, Mti);
   // system("pause");
