@@ -162,9 +162,9 @@ signed main()
   }
     if(opt!=1 && opt!=2) {
       ans^=la;
-//      if(i >= 329600) {
-        printf("%u\n", la);
-//      }
+      if(i >= 329200) {
+        printf("%u %u %u\n", i, opt, la);
+      } 
     }
  }
  

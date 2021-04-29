@@ -10,7 +10,7 @@
 #include <vector>
 #define Wild_Donkey 0
 using namespace std;
-inline unsigned RD() {
+inline unsigned RD() {    // Fast Read
   unsigned intmp = 0;
   char rdch(getchar());
   while (rdch < '0' || rdch > '9') {
@@ -22,42 +22,13 @@ inline unsigned RD() {
   }
   return intmp;
 }
-unsigned a[100005], b[100005], m, n, RealN(0), Cnt(0), A, B, C, D, t, Ans(0), Tmp(0), Last(0);
+unsigned a[100005], b[100005], m, n, RealN(0), Cnt(0), C, D, t, Tmp(0);
+bool Flg(0);
 struct Node {
   Node *Fa, *LS, *RS;
   unsigned Value, Size, Count;
 }N[1100005], *CntN(N), *Root(N);
-inline void Clr() {}
-inline void Point(Node *x) {
-  printf("Point %u\n", x - N);
-  if(!x) {
-    printf("Empty Point, Oops!\n");
-  }
-  else {
-    printf("Fa %.11u ", x->Fa - N);
-    printf("Value %.11u ", x->Value);
-    printf("Size %.11u ", x->Size);
-    printf("Count %.11u\n", x->Count);
-    printf("LS %.11u ", x->LS - N);
-    if(x->LS) {
-      printf("Val %.11u ", x->LS->Value);
-    }
-    else {
-      printf("Empty    ");
-    }
-    printf("RS %.11u ", x->RS - N);
-    if(x->RS) {
-      printf("Val %.11u ", x->RS->Value);
-    }
-    else {
-      printf("Empty    ");
-    }
-  }
-  printf("\n\n");
-  return;
-}
-Node *Build(unsigned Le, unsigned Ri, Node *Father) {
-//  printf("Build %u %u %u\n", Le, Ri, Father - N);
+Node *Build(register unsigned Le, register unsigned Ri, register Node *Father) {
   if(Le ^ Ri) { // This Subtree is Bigger than 1
     unsigned Mid((Le + Ri) >> 1);
     Node *x(++CntN);
@@ -67,48 +38,32 @@ Node *Build(unsigned Le, unsigned Ri, Node *Father) {
     x->Fa = Father;
     if(Le ^ Mid) {
       x->LS = Build(Le, Mid - 1, x);
-//      printf("LS %u %u\n", x->LS - N, x - N);
       x->Size += x->LS->Size;
     }
     x->RS = Build(Mid + 1, Ri, x);
     x->Size += x->RS->Size;
     return x;
-  }      
-//    printf("%u %u %u\n", Le, a[Le], b[Le]);
+  }
   (++CntN)->Count = b[Le];// Single Point
   CntN->Size = b[Le];
   CntN->Value = a[Le];
   CntN->Fa = Father;
-//  Point(CntN);
   return CntN;
 }
-inline Node *GoLeft(Node *x) {
-  while (x->LS) {
-    x = x->LS;
-  }
-  return x;
-}
-inline Node *GoRight(Node *x) {
-  while (x->RS) {
-    x = x->RS;
-  }
-  return x;
-}
-inline void Rotate(Node *x) {
-//  printf("Rotate %u\n", x - N);
-  if (x->Fa) {
-    Node *Father(x->Fa);
-    x->Fa = Father->Fa;
-    if(Father->Fa) {  // Grandfather's 
-      if(Father == Father->Fa->LS) {  // Left Son
+inline void Rotate(register Node *x) {  // 绕父旋转 
+  if (x->Fa){ 
+    Node *Father(x->Fa);                // 暂存父亲
+    x->Fa = Father->Fa;                 // 父亲连到爷爷上 
+    if(Father->Fa) {                    // Grandfather's Son (更新爷爷的儿子指针)
+      if(Father == Father->Fa->LS) {    // Left Son
         Father->Fa->LS = x;
       }
-      else {                          // Right Son
+      else {                            // Right Son
         Father->Fa->RS = x;
       }
     }
-    x->Size = x->Count;
-    if(x == Father->LS) { // Left Son, Zag
+    x->Size = x->Count;                 // x 的 Size 的一部分 (x->Size = x->LS->Size + x->RS->Size + x->Count) 
+    if(x == Father->LS) {               // x is the Left Son, Zag(x->Fa)
       if(x->LS) {
         x->Size += x->LS->Size;
       }
@@ -117,7 +72,7 @@ inline void Rotate(Node *x) {
         Father->LS->Fa = Father;
       }
     }
-    else {                // Right Son, Zig
+    else {                              // x is the Right Son, Zig(x->Fa)
       if(x->RS) {
         x->Size += x->RS->Size;
       }
@@ -126,21 +81,18 @@ inline void Rotate(Node *x) {
         Father->RS->Fa = Father;
       }
     }
-    Father->Fa = x, Father->Size = Father->Count;
-    if(Father->LS) {
+    Father->Fa = x/*父亲的新父亲是 x*/, Father->Size = Father->Count/*Father->Size 的一部分*/;
+    if(Father->LS) {                    // 处理 Father 两个儿子对 Father->Size 的贡献 
       Father->Size += Father->LS->Size;
     }
     if(Father->RS) {
       Father->Size += Father->RS->Size;
     }
-    x->Size += Father->Size;
+    x->Size += Father->Size;            // Father->Size 更新后才能更新 x->Size 
   }
-//  Point(x);
   return;
 } 
 void Splay(Node *x) {
-//  printf("Splay %u\n", x - N);
-//  Point(x);
   if(x->Fa) {
     while (x->Fa->Fa) {
       if(x == x->Fa->LS) { // Boy
@@ -163,76 +115,61 @@ void Splay(Node *x) {
     Rotate(x);
   }
   Root = x;
-//  printf("??\n");
   return;
 }
-void Insert(Node *x, unsigned &y) {
-//  printf("Insert %u %u\n", x - N, y);
-//  Point(x);
-  ++(x->Size);
-  if(y < x->Value) {
-    if(x->LS) {
-      return Insert(x->LS, y);
+void Insert(register Node *x, unsigned &y) {
+  while (x->Value ^ y) {
+    ++(x->Size);      // 作为加入元素的父节点, 子树大小增加 
+    if(y < x->Value) {// 在左子树上 
+      if(x->LS) {     // 有左子树, 往下走 
+        x = x->LS;
+        continue;
+      }
+      else {          // 无左子树, 建新节点 
+        x->LS = ++CntN;
+        CntN->Fa = x;
+        CntN->Value = y;
+        CntN->Size = 1;
+        CntN->Count = 1;
+        return Splay(CntN);
+      }
     }
-    else {
-      x->LS = ++CntN;
-      CntN->Fa = x;
-      CntN->Value = y;
-      CntN->Size = 1;
-      CntN->Count = 1;
-      Splay(CntN);
-      return; 
+    else {            // 右子树的情况同理 
+      if(x->RS) {
+        x = x->RS;
+      }
+      else {
+        x->RS = ++CntN;
+        CntN->Fa = x;
+        CntN->Value = y;
+        CntN->Size = 1;
+        CntN->Count = 1;
+        return Splay(CntN); 
+      }
     }
   }
-  if(y > x->Value) {
-    if(x->RS) {
-      return Insert(x->RS, y);
-    }
-    else {
-      x->RS = ++CntN;
-      CntN->Fa = x;
-      CntN->Value = y;
-      CntN->Size = 1;
-      CntN->Count = 1;
-      Splay(CntN);
-      return; 
-    }
-  }
-  ++(x->Count);
-  Splay(x);
+  ++(x->Count), ++x->Size;  // 原来就有对应节点 
+  Splay(x);                 // Splay 维护 BST 的深度复杂度 
   return;
 }
-void Delete(Node *x, unsigned &y) {
-//  printf("Delete %u %u\n", x - N, y);
-//  Point(x);
-  if(y < x->Value) {
-    if(x->LS) {
-      Delete(x->LS, y);
+void Delete(register Node *x, unsigned &y) {
+  while (x->Value ^ y) {
+    x = (y < x->Value) ? x->LS : x->RS;
+    if(!x) {
+      return;
     }
-//    else {
-//      printf("%u %u CNMGXB\n", x - N, y);
-//      Point(x);
-//    }
-    return;
-  }
-  if(y > x->Value) {
-    if(x->RS) {
-      Delete(x->RS, y);
-    }
-//    else {
-//      printf("%u %u CNMGXB\n", x - N, y);
-//      Point(x);
-//    }
-    return;
   }
   Splay(x);
-  if(x->Count ^ 1) {
+  if(x->Count ^ 1) {      // Don't Need to Delete the Node
     --(x->Count), --(x->Size);
     return;
   }
-  if(x->LS && x->RS) {    // Both Sons
-    x->LS->Fa = NULL/*Delete x*/, Splay(GoRight(x->LS));// Let the biggest Node in (x->LS) (the subtree) be the new root 
-//    printf("Boom?!\n");
+  if(x->LS && x->RS) {    // Both Sons left
+    register Node *Son(x->LS);
+    while (Son->RS) {
+      Son = Son->RS;
+    }
+    x->LS->Fa = NULL/*Delete x*/, Splay(Son);// Let the biggest Node in (x->LS) (the subtree) be the new root 
     Root->RS = x->RS;
     x->RS->Fa = Root;                       // The right son is still the right son
     Root->Size = Root->Count + x->RS->Size;
@@ -251,131 +188,123 @@ void Delete(Node *x, unsigned &y) {
   }
   return;
 }
-void Value_Rank(Node *x, unsigned &y, unsigned &Rank) {
-//  printf("Value_Rank %u %u %u\n", x - N, y, Rank);
-//  Point(x);
-  if(y < x->Value) {  // Go left
-//    printf("%u < %u???\n", y, x->Value);
-    if(x->LS) {
-      Value_Rank(x->LS, y, Rank);
+void Value_Rank(register Node *x, unsigned &y, unsigned &Rank) {
+  while (x->Value ^ y) {  // Go Down
+    if(y < x->Value) {    // Go Left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      return;             // No more numbers smaller than y, Rank is the rank
     }
-    return;
-  }
-//  printf("Then?\n");
-  if(x->LS) {
-    Rank += x->LS->Size;// The Left Subtree numbers
-  }
-  if(y > x->Value) {  // Go right
-    Rank += x->Count; // Mid Point numbers
-    if(x->RS) {
-      Value_Rank(x->RS, y, Rank);
+    else {                // Go Right
+      if(x->LS) {
+        Rank += x->LS->Size;    // The Left Subtree numbers
+      }
+      Rank += x->Count;         // Mid Point numbers
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      return;             // No more numbers bigger than y, Rank is the rank
     }
-    return;
+  }
+  if(x->LS) {             // now, x->Value == y
+    Rank += x->LS->Size;
   }
   return;
 }
-void Rank_Value(Node *x, unsigned &y) {
-//  printf("Rank_Value %u %u\n", x - N, y);
-//  Point(x);
-  if(x->LS) {
-    if(y > x->LS->Size) {
-      y -= x->LS->Size;
-    }
-    else {  // In Left Subtree
-      return Rank_Value(x->LS, y);
-    }
-  }
-  if(y > x->Count) {
-    y -= x->Count;
-    return Rank_Value(x->RS, y);
-  }
-  else {
-    return Splay(x);
-  }
-  return;
-}
-void Before(Node *x, unsigned &y) {
-//  printf("Before %u %u\n", x - N, y);
-  if(y <= x->Value) {  // Go left
+void Rank_Value(register Node *x, unsigned &y) {
+  while (x) {
     if(x->LS) {
-      return Before(x->LS, y);
-    }
-    while (x) {
-      if(x->Value < y) {
-        return Splay(x);
+      if(x->LS->Size < y) {//Not in the Left
+        y -= x->LS->Size;
       }
-      x = x->Fa;
-    }
-    printf("WDNMD!\n"); 
-    return;
-  }
-  if(y > x->Value) {  // Go right
-    if(x->RS) {
-      return Before(x->RS, y);
-    }
-  }
-  return Splay(x);  // Value[x] <=  (Key-1) 
-}
-void After(Node *x, unsigned &y) {
-//  printf("After %u %u\n", x - N, y);
-//  Point(x);
-  if(y > x->Value) {  // Go right
-    if(x->RS) {
-      return After(x->RS, y);
-    }
-    while (x) {
-      if(x->Value >= y) {
-        return Splay(x);
+      else {            // In Left Subtree
+        x = x->LS;
+        continue;
       }
-      x = x->Fa;
     }
-    printf("WDNMD!\n"); 
-  }
-  if(y < x->Value) {  // Go left
-    if(x->LS) {
-      return After(x->LS, y);
+    if(y > x->Count) {  // In Right Subtree 
+      y -= x->Count;
+      x = x->RS;
+      continue;
     }
+    return Splay(x);    // Just Look for x 
   }
-  return Splay(x);  // Value[x] >=  (Key+1) 
 }
-int main() {
-  // double Ti(clock()), Mti(0);
-   freopen("P6136_6.in", "r", stdin);
-   freopen("my.out", "w", stdout);
-//  t = RD();
-//  for (register unsigned T(1); T <= t; ++T){
-//  Clr();
+void Before(register Node *x, unsigned &y) {
+  while (x) {
+    if(y <= x->Value) {   // Go left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      while (x) {         // Go Up
+        if(x->Value < y) {
+          return Splay(x);
+        }
+        x = x->Fa;
+      }
+    }
+    else {                // Go right
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      return Splay(x);    // Value[x] < Key
+    }
+  }
+}
+void After(register Node *x, unsigned &y) {
+  while (x) {
+    if(y >= x->Value) {     // Go right
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      while (x) {           // Go Up
+        if(x->Value > y) {
+          return Splay(x);
+        }
+        x = x->Fa;
+      }
+    }
+    else {                  // Go left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      return Splay(x);
+    }
+  }
+}
+signed main() {
+  register unsigned Ans(0);  // 记录 
   n = RD();
   m = RD();
   a[0] = 0x7f3f3f3f;
-  if(n == 0) {
-    a[1] = 0x7f3f3f3f;
-    Build(1, 1, NULL);
+  for (register unsigned i(1); i <= n; ++i) { // 原集合 
+    a[i] = RD();
   }
-  else {
-    for (register unsigned i(1); i <= n; ++i) {
-      a[i] = RD();
+  sort(a + 1, a + n + 1);                     // 排序 
+  for (register unsigned i(1); i <= n; ++i) { // 去重 
+    if(a[i] ^ a[i - 1]) { // A new number
+      b[++RealN] = 1;
+      a[RealN] = a[i];
     }
-    sort(a + 1, a + n + 1);
-    for (register unsigned i(1); i <= n; ++i) {
-      if(a[i] ^ a[i - 1]) { // A new number
-        b[++RealN] = 1;
-        a[RealN] = a[i];
-//        printf("%u %u %u\n", RealN, a[RealN], b[RealN]);
-      }
-      else {                // Old number
-        ++b[RealN];
-      }
+    else {                // Old number
+      ++b[RealN];
     }
-    Build(1, RealN, NULL);
   }
-  Root = N + 1;
-  for (register unsigned i(1); i <= m; ++i) {
+  a[++RealN] = 0x7f3f3f3f;                    // 加入哨兵 
+  b[RealN] = 1;
+  Build(1, RealN, NULL);                      // 建树 
+  Root = N + 1;                               // 初始化根 (根是第一个点, 因为递归建树是 DFS, 根是 DFS 序最小的) 
+  for (register unsigned i(1), A, B, Last(0); i <= m; ++i) {
     A = RD();
-//    B = RD();
     B = RD() ^ Last;
-//    printf("%u %u\n", A, B);
-    switch(A) {
+    switch(A) {   // 分别是对应的 6 个操作 
       case 1:{
         Insert(Root, B);
         break;
@@ -403,35 +332,13 @@ int main() {
         break;
       }
       case 6:{
-        ++B;
         After(Root, B);
         Last = Root->Value;
         Ans ^= Last;
         break;
       }
-      default :{
-        printf("Because you silly!\n");
-        break;
-      }
     }
-//    if(i >= 329600) {
-//      printf("%u\n", i);
-      if(A >= 3) {
-        printf("%u %u %u\n", i, A, Last);
-//        printf("%u\n", Last);
-      }
-//    }
-//  printf("%u\n", Ans);
   }
   printf("%u\n", Ans);
-//  }
-  // Ti = clock() - Ti;
-  // printf("Time %lf MTime %lf\n", Ti, Mti);
-  // system("pause");
-  // fclose(stdin);
-  // fclose(stdout);
   return Wild_Donkey;
 }
-
-
-
