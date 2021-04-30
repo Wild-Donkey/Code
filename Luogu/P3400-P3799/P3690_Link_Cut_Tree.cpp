@@ -45,7 +45,7 @@ struct Node {
   Node *Son[2], *Fa;
   char Tag;
   unsigned Value, Sum;
-}N[20005], *Q[20005], *now(N), *Cntn(N), *Find(N);
+}N[100005], *Stack[105];
 inline void Update(Node *x) {
   x->Sum = x->Value;
   if(x->Son[0]) {
@@ -58,6 +58,7 @@ inline void Update(Node *x) {
 }
 inline void Push_Down(Node *x) {
   if(x->Tag) {
+    printf("Push_Down %u\n", x - N);
     x->Tag = 0;
     register Node *TmpSon(x->Son[0]);
     x->Son[0] = x->Son[1];
@@ -96,21 +97,42 @@ inline void Rotate(Node *x) {
   x->Sum ^= x->Value ^ Father->Value;
   return;
 }
-void Splay (Node *x) {//Must be sure there's no tags alone Root-x, and delete Root->Fa for a while 
+void Splay (Node *x) {
   printf("Splay %u\n", x - N);
   if(!x) {
     printf("What the hell you're doing?! NULL here\n");
   }
+  register unsigned Head(0);
+  while (x->Fa) {                                      // 父亲没到头
+    if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {  // x is the preferred-edge linked son (实边连接的儿子)
+      Stack[++Head] = x;
+      Update(x);
+      x = x->Fa;
+      continue;
+    }
+    break;
+  }
+  if(!Head) {
+    Update(x);
+    Push_Down(x);
+    return;
+  }
+  Update(x->Fa);
+  Push_Down(x->Fa); 
+  printf("Fuck");
+  for (register unsigned i(Head); i > 0; --i) {//Must be sure there's no tags alone Root-x, and delete Root->Fa for a while 
+    Push_Down(Stack[i]);
+  }
+  x = Stack[1];
   if (x->Fa) {                                      // 父亲没到头
     if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {  // x is the preferred-edge linked son (实边连接的儿子)
-      register Node *Father(x->Fa);
-      while (Father->Fa) {
-        if (Father->Fa->Son[0] == Father) { // Father
-          Rotate((Father->Fa->Son[0] == Father) ? Father : x), Father = x->Fa;
+      while (x->Fa->Fa) {
+        if (x->Fa->Fa->Son[0] == x->Fa) { // Father
+          Rotate((x->Fa->Son[0] == x) ? x->Fa : x);
           continue;
         }
-        if (Father->Fa->Son[0] == Father) { // Mother
-          Rotate((Father->Fa->Son[0] == Father) ? x : Father), Father = x->Fa;
+        if (x->Fa->Fa->Son[1] == x->Fa) { // Mother
+          Rotate((x->Fa->Son[0] == x) ? x : x->Fa);
           continue;
         }
         break;                              // End
@@ -123,13 +145,14 @@ void Splay (Node *x) {//Must be sure there's no tags alone Root-x, and delete Ro
 void Access (Node *x) {     // Let x be the bottom of the chain where the root at
   printf("Access %u\n", x - N);
   Node *Father(x->Fa);
-  x->Son[1] = NULL; // Delete x's right son
+  x->Son[1] = NULL;         // Delete x's right son
   Splay(x);
   while (Father) {
     Splay(Father);
     Father->Son[1] = x; // Change the right son
     x = Father;
     Father = x->Fa;     // Go up
+    Update(x);
   }
   return;
 }
@@ -176,7 +199,7 @@ int main() {
       case 1: { // Link
         Make_Root(N + B);         // x 为根, 也是所在 Splay 的根 
         if(Find_Root(N + C) != N + B) {// x, y 不连通, y 在 Fink_Root 时已经是它所在 Splay 的根了, 也是它原树根所在实链底, 右子树为空 
-          N[C].Son[1] = N + B;    // 所以 y 的右儿子变成 x 
+          N[C].Son[1] = N + B;    // 所以 y 的右儿子变成 x
           Update(N + C);          // 更新 y 的 Sum 
         }
         break;
