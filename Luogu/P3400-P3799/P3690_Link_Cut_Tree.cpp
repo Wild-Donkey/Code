@@ -39,14 +39,28 @@ inline int RDsg() {
   return rdtp * rdsg;
 }
 unsigned a[10005], n, m, Cnt(0), Tmp(0), Mx;
-bool b[10005];
+bool flg(0);
 char inch, List[155][75];
 struct Node {
   Node *Son[2], *Fa;
   char Tag;
   unsigned Value, Sum;
 }N[100005], *Stack[105];
+inline void Check(Node *x) {
+  printf("Node %u\n", x - N);
+  printf("V %u S %u T %u\n", x->Value, x->Sum, x->Tag);
+  printf("Fa %u Son %u %u\n", x->Fa - N, x->Son[0] - N, x->Son[1] - N);
+  printf("\n\n\n");
+  return;
+}
+inline void Check() {
+  for (register unsigned i(1); i <= n; ++i) {
+    Check(N + i);
+  }
+  return;
+}
 inline void Update(Node *x) {
+//  printf("Update %u\n", x - N); 
   x->Sum = x->Value;
   if(x->Son[0]) {
     x->Sum ^= x->Son[0]->Sum;
@@ -54,11 +68,12 @@ inline void Update(Node *x) {
   if(x->Son[1]) {
     x->Sum ^= x->Son[1]->Sum;
   }
+//  printf("Sum[%u] = %u\n", x - N, x->Sum);
   return;
 }
 inline void Push_Down(Node *x) {
   if(x->Tag) {
-    printf("Push_Down %u\n", x - N);
+//    printf("Push_Down %u\n", x - N);
     x->Tag = 0;
     register Node *TmpSon(x->Son[0]);
     x->Son[0] = x->Son[1];
@@ -72,55 +87,77 @@ inline void Push_Down(Node *x) {
   }
 }
 inline void Make_Tag (Node *x) {
-  printf("Make_Tag %u\n", x - N);
+//  printf("Make_Tag %u\n", x - N);
   x->Tag ^= 1;
   return;
 }
 inline void Rotate(Node *x) {
-  printf("Rotate %u\n", x - N); 
+//  if(x->Fa->Tag) {
+//    printf("?\n?\n?\n");
+//  }
+//  printf("Rotate %u\n", x - N);
+//  Check();
   register Node *Father(x->Fa);
   x->Fa = Father->Fa; // x link to grandfather
   if(Father->Fa) {
-    Father->Fa->Son[(Father->Fa->Son[0] == Father) ? 0 : 1] = x;  // grandfather link to x
+    if(Father->Fa->Son[0] == Father || Father->Fa->Son[1] == Father) {
+      Father->Fa->Son[(Father->Fa->Son[0] == Father) ? 0 : 1] = x;  // grandfather link to x
+    }
   }
+  x->Sum = 0;
+  Father->Fa = x;
+//  Check(x);
   if(Father->Son[0] == x) {
     Father->Son[0] = x->Son[1];
+    if(Father->Son[0]) {
+      Father->Son[0]->Fa = Father;
+    }
     x->Son[1] = Father;
-    x->Sum = x->Son[0]->Sum;
+    if(x->Son[0]) {
+      x->Sum = x->Son[0]->Sum;
+    }
   }
   else {
     Father->Son[1] = x->Son[0];
-    x->Son[0] = Father; 
-    x->Sum = x->Son[1]->Sum;
+    if(Father->Son[1]) {
+      Father->Son[1]->Fa = Father;
+    }
+    x->Son[0] = Father;
+    if(x->Son[1]) {
+      x->Sum = x->Son[1]->Sum;
+    }
   }
+//  Check(x);
   Update(Father);
-  x->Sum ^= x->Value ^ Father->Value;
+  x->Sum ^= x->Value ^ Father->Sum;
+//  printf("Rotating Update Sum[%u] = %u\n", x - N, x->Sum);
   return;
 }
 void Splay (Node *x) {
-  printf("Splay %u\n", x - N);
-  if(!x) {
-    printf("What the hell you're doing?! NULL here\n");
+  if(flg) {
+    printf("Splay %u\n", x - N);
   }
+//  if(!x) {
+//    printf("What the hell you're doing?! NULL here\n");
+//  }
   register unsigned Head(0);
   while (x->Fa) {                                      // 父亲没到头
     if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {  // x is the preferred-edge linked son (实边连接的儿子)
       Stack[++Head] = x;
-      Update(x);
       x = x->Fa;
       continue;
     }
     break;
   }
   if(!Head) {
-    Update(x);
     Push_Down(x);
     return;
   }
-  Update(x->Fa);
-  Push_Down(x->Fa); 
-  printf("Fuck");
+//  printf("See %u?\n", x - N);
+  Push_Down(x); 
+//  printf("Fuck\n");
   for (register unsigned i(Head); i > 0; --i) {//Must be sure there's no tags alone Root-x, and delete Root->Fa for a while 
+//    printf("Stackpush %u\n", Stack[i] - N); 
     Push_Down(Stack[i]);
   }
   x = Stack[1];
@@ -140,41 +177,61 @@ void Splay (Node *x) {
       Rotate(x);  //最后一次旋转
     }
   }
+//  printf("Rotated?\n"); 
   return;
 }
 void Access (Node *x) {     // Let x be the bottom of the chain where the root at
-  printf("Access %u\n", x - N);
-  Node *Father(x->Fa);
-  x->Son[1] = NULL;         // Delete x's right son
+  if(flg) { 
+    printf("Access %u{\n", x - N);
+  }
   Splay(x);
+  x->Son[1] = NULL;         // Delete x's right son
+  Update(x);
+  Node *Father(x->Fa);
   while (Father) {
+//    printf("Access Step %u\n", x - N);
+//    Check(Father);
     Splay(Father);
+//    Check(Father);
     Father->Son[1] = x; // Change the right son
     x = Father;
     Father = x->Fa;     // Go up
     Update(x);
   }
+  if(flg) { 
+    printf("}\n");
+  }
   return;
 }
 void Make_Root(Node *x) {   // Let x be the new root
-  printf("Make_Root %u\n", x - N);
+  if(flg) {
+    printf("Make_Root %u\n", x - N);
+  }
   Access(x);
   Splay(x);
   Make_Tag(x);
   return;
 }
 Node *Find_Root(Node *x) {  // Find the root
+//  printf("Find_Root %u\n", x - N);
   Access(x);
+//  printf("So why you down\n");
+//  Check(); 
   Splay(x);
+//  Check();
+//  printf("Splayed\n");
   Push_Down(x);
+//  printf("Pushed\n");
   while (x->Son[1]) {
+//    printf("While %u\n", x - N);
     x = x->Son[1];
     Push_Down(x); 
   }
+//  printf("Found %u\n", x - N);
   return x;
 }
 int main() {
-//   freopen("P3796_1.in", "r", stdin);
+   freopen("P3690_1.in", "r", stdin);
 //   freopen("P3796.out", "w", stdout);
 //  t = RD();
   n = RD();
@@ -187,7 +244,11 @@ int main() {
     A = RD();
     B = RD();
     C = RD();
-//    printf("Action %u, Do %u, %u, %u\n", i, A, B, C);
+    if(i >= 100000) {
+      flg = 1;
+      printf("Action %u, Do %u, %u, %u\n", i, A, B, C);
+    }
+//    Check();
     switch (A) {
       case 0: { // Query
         Make_Root(N + B); // x 为根 
@@ -197,21 +258,25 @@ int main() {
         break;
       }
       case 1: { // Link
-        Make_Root(N + B);         // x 为根, 也是所在 Splay 的根 
+        Make_Root(N + B);         // x 为根, 也是所在 Splay 的根
+//        Check();
         if(Find_Root(N + C) != N + B) {// x, y 不连通, y 在 Fink_Root 时已经是它所在 Splay 的根了, 也是它原树根所在实链底, 右子树为空 
           N[C].Son[1] = N + B;    // 所以 y 的右儿子变成 x
+          N[B].Fa = N + C;        // 父指针 
           Update(N + C);          // 更新 y 的 Sum 
         }
         break;
       }
       case 2: { // Cut
-        Make_Root(N + B);                         // x 为根, 也是所在 Splay 的根 
+        Make_Root(N + B);                         // x 为根, 也是所在 Splay 的根
+//        Check();
         if(Find_Root(N + C) == N + B) {           // x, y 连通 
           if(N[B].Fa == N + C && !(N[B].Son[1])) {// y 是 x 在 Splay 上的父亲, x 无右子树, 所以有直连边
             N[B].Fa = N[C].Son[0] = NULL;         // 断边
             Update(N + C);                        // 更新 y (x 的子树不变, 无需更新) 
           } 
         }
+//        printf("Done\n");
         break;
       }
       case 3: { // Change
@@ -219,7 +284,7 @@ int main() {
         N[B].Value = C; // 改权值 
         Update(N + B);  // 更新 Sum 
         break;
-      } 
+      }
     }
   }
   // Ti = clock() - Ti;
@@ -229,3 +294,25 @@ int main() {
   // fclose(stdout);
   return Wild_Donkey;
 }
+/*
+2 7
+1
+2
+1 1 2
+0 1 2
+3 1 4
+0 1 2
+2 1 2
+1 1 2
+0 1 2
+
+2 6
+1
+2
+1 1 2
+0 1 2
+0 1 1
+2 1 2
+0 1 1
+0 2 2
+*/
