@@ -35,11 +35,23 @@ inline void Point(Node *x) {
   }
   else {
     printf("Fa %.11u ", x->Fa - N);
-    printf("LS %.11u ", x->LS - N);
-    printf("RS %.11u ", x->RS - N);
     printf("Value %.11u ", x->Value);
     printf("Size %.11u ", x->Size);
     printf("Count %.11u\n", x->Count);
+    printf("LS %.11u ", x->LS - N);
+    if(x->LS) {
+      printf("Val %.11u ", x->LS->Value);
+    }
+    else {
+      printf("Empty    ");
+    }
+    printf("RS %.11u ", x->RS - N);
+    if(x->RS) {
+      printf("Val %.11u ", x->RS->Value);
+    }
+    else {
+      printf("Empty    ");
+    }
   }
   printf("\n\n");
   return;
@@ -56,18 +68,17 @@ Node *Build(unsigned Le, unsigned Ri, Node *Father) {
     if(Le ^ Mid) {
       x->LS = Build(Le, Mid - 1, x);
 //      printf("LS %u %u\n", x->LS - N, x - N);
-      x->Size += x->LS->Size; 
+      x->Size += x->LS->Size;
     }
     x->RS = Build(Mid + 1, Ri, x);
     x->Size += x->RS->Size;
-  }
-  else {      // Single Point
+    return x;
+  }      
 //    printf("%u %u %u\n", Le, a[Le], b[Le]);
-    (++CntN)->Count = b[Le];
-    CntN->Size = b[Le];
-    CntN->Value = a[Le];
-    CntN->Fa = Father;
-  }
+  (++CntN)->Count = b[Le];// Single Point
+  CntN->Size = b[Le];
+  CntN->Value = a[Le];
+  CntN->Fa = Father;
 //  Point(CntN);
   return CntN;
 }
@@ -88,7 +99,7 @@ inline void Rotate(Node *x) {
   if (x->Fa) {
     Node *Father(x->Fa);
     x->Fa = Father->Fa;
-    if(Father->Fa) {  // Grandfather
+    if(Father->Fa) {  // Grandfather's 
       if(Father == Father->Fa->LS) {  // Left Son
         Father->Fa->LS = x;
       }
@@ -102,12 +113,18 @@ inline void Rotate(Node *x) {
         x->Size += x->LS->Size;
       }
       Father->LS = x->RS, x->RS = Father;
+      if(Father->LS) {
+        Father->LS->Fa = Father;
+      }
     }
     else {                // Right Son, Zig
       if(x->RS) {
         x->Size += x->RS->Size;
       }
       Father->RS = x->LS, x->LS = Father;
+      if(Father->RS) {
+        Father->RS->Fa = Father;
+      }
     }
     Father->Fa = x, Father->Size = Father->Count;
     if(Father->LS) {
@@ -150,8 +167,8 @@ void Splay(Node *x) {
   return;
 }
 void Insert(Node *x, unsigned &y) {
-  printf("Insert %u %u\n", x - N, y);
-  Point(x);
+//  printf("Insert %u %u\n", x - N, y);
+//  Point(x);
   ++(x->Size);
   if(y < x->Value) {
     if(x->LS) {
@@ -192,12 +209,20 @@ void Delete(Node *x, unsigned &y) {
     if(x->LS) {
       Delete(x->LS, y);
     }
+//    else {
+//      printf("%u %u CNMGXB\n", x - N, y);
+//      Point(x);
+//    }
     return;
   }
   if(y > x->Value) {
     if(x->RS) {
       Delete(x->RS, y);
     }
+//    else {
+//      printf("%u %u CNMGXB\n", x - N, y);
+//      Point(x);
+//    }
     return;
   }
   Splay(x);
@@ -205,30 +230,41 @@ void Delete(Node *x, unsigned &y) {
     --(x->Count), --(x->Size);
     return;
   }
-  x->Size = x->Count = 0; // Delete Node x
   if(x->LS && x->RS) {    // Both Sons
-    x->LS->Fa = NULL, Splay(GoRight(x->LS));// Let the biggest Node in (x->LS) (the subtree) be the new root 
+    x->LS->Fa = NULL/*Delete x*/, Splay(GoRight(x->LS));// Let the biggest Node in (x->LS) (the subtree) be the new root 
+//    printf("Boom?!\n");
     Root->RS = x->RS;
-    x->RS->Fa = Root;                       // The right son is still the right son 
-    Root->Size = Root->LS->Size + Root->RS->Size;
+    x->RS->Fa = Root;                       // The right son is still the right son
+    Root->Size = Root->Count + x->RS->Size;
+    if(Root->LS) {
+      Root->Size += Root->LS->Size; 
+    }
     return;
   }
-  if(x->LS) {
-    
+  if(x->LS) { // x is The Biggest Number
+    x->LS->Fa = NULL; // x->LS is the new Root
+    Root = x->LS; 
   }
-  if(x->RS) {
-    
+  if(x->RS) { //x is The Smallest Number
+    x->RS->Fa = NULL; // x->LS is the new Root
+    Root = x->RS; 
   }
   return;
 }
 void Value_Rank(Node *x, unsigned &y, unsigned &Rank) {
+//  printf("Value_Rank %u %u %u\n", x - N, y, Rank);
+//  Point(x);
   if(y < x->Value) {  // Go left
+//    printf("%u < %u???\n", y, x->Value);
     if(x->LS) {
       Value_Rank(x->LS, y, Rank);
     }
     return;
   }
-  Rank += x->LS->Size;// The Left Subtree numbers
+//  printf("Then?\n");
+  if(x->LS) {
+    Rank += x->LS->Size;// The Left Subtree numbers
+  }
   if(y > x->Value) {  // Go right
     Rank += x->Count; // Mid Point numbers
     if(x->RS) {
@@ -259,12 +295,13 @@ void Rank_Value(Node *x, unsigned &y) {
   return;
 }
 void Before(Node *x, unsigned &y) {
-  if(y < x->Value) {  // Go left
+//  printf("Before %u %u\n", x - N, y);
+  if(y <= x->Value) {  // Go left
     if(x->LS) {
       return Before(x->LS, y);
     }
     while (x) {
-      if(x->Value <= y) {
+      if(x->Value < y) {
         return Splay(x);
       }
       x = x->Fa;
@@ -303,15 +340,16 @@ void After(Node *x, unsigned &y) {
 }
 int main() {
   // double Ti(clock()), Mti(0);
-   freopen("P6136_1.in", "r", stdin);
-  // freopen(".out", "w", stdout);
+   freopen("P6136_6.in", "r", stdin);
+   freopen("my.out", "w", stdout);
 //  t = RD();
 //  for (register unsigned T(1); T <= t; ++T){
 //  Clr();
   n = RD();
   m = RD();
+  a[0] = 0x7f3f3f3f;
   if(n == 0) {
-    a[1] = 0x3f3f3f3f;
+    a[1] = 0x7f3f3f3f;
     Build(1, 1, NULL);
   }
   else {
@@ -336,6 +374,7 @@ int main() {
     A = RD();
 //    B = RD();
     B = RD() ^ Last;
+//    printf("%u %u\n", A, B);
     switch(A) {
       case 1:{
         Insert(Root, B);
@@ -348,22 +387,18 @@ int main() {
       case 3:{
         Last = 1;
         Value_Rank(Root, B, Last);
-//        printf("%u\n", Last);
         Ans ^= Last;
         break;
       }
       case 4:{
         Rank_Value(Root, B);
         Last = Root->Value;
-//        printf("%u\n", Last);
         Ans ^= Last;
         break;
       }
       case 5:{
-        --B; 
         Before(Root, B);
         Last = Root->Value;
-//        printf("%u\n", Last);
         Ans ^= Last;
         break;
       }
@@ -371,7 +406,6 @@ int main() {
         ++B;
         After(Root, B);
         Last = Root->Value;
-//        printf("%u\n", Last);
         Ans ^= Last;
         break;
       }
@@ -380,7 +414,14 @@ int main() {
         break;
       }
     }
-  printf("%u\n", Ans);
+//    if(i >= 329600) {
+//      printf("%u\n", i);
+      if(A >= 3) {
+        printf("%u %u %u\n", i, A, Last);
+//        printf("%u\n", Last);
+      }
+//    }
+//  printf("%u\n", Ans);
   }
   printf("%u\n", Ans);
 //  }
