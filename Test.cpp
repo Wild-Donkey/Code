@@ -62,5 +62,10 @@ int main() {
   // fclose(stdout);
   return Wild_Donkey;
 }
-// Main PC 233.7s
-//
+// Luogu Online IDE with O2 0.062s
+// LCEZ's Lenovo Computer with i3-4170 O2 1.361s
+// 2012 ASUS with o2 2.326s
+// Wild_Donkey's Main PC with r7-3700X 233.7s
+// LCEZ's Lenovo Computer with i3-4170 294.4s
+// SDSY's Huawei Laptop with i7-4790H 303s
+// Actinoi MAC Book 1116.4s
