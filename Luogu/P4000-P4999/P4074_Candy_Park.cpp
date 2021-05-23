@@ -38,15 +38,15 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned V[100005], W[100005], SumW[100005], Q, m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0), Ti, Que;
+unsigned V[100005], W[100005], Q, m, n, Cnt[100005], CntEu(0), A, B, C, D, t, Ans(0), Tmp(0), Ti, Que;
 long long Euler[200005];
-bool b[10005];
 struct Edge;
 struct Node {
   Edge *Fst;
   Node *Fa[20];
   unsigned Dep, Frnt, Back;
-}N[100005];
+  char Have;
+}N[100005], *Euler[200005];
 struct Edge {
   Edge *Nxt;
   Node *To;
@@ -56,44 +56,57 @@ inline void Link(Node *x, Node *y) {
   x->Fst = CntE;
   CntE->To = y;
   return;
-} 
-inline void Clr() {}
+}
 void DFS(Node *x) {
-  x->Frnt = ++Cnt;
+  x->Frnt = ++CntEu;
+  Euler[CntEu] = x;
   Edge *Sid(x->Fst);
   while (Sid) {
     if(Sid->To != x->Fa[0]) {
       Sid->To->Fa[0] = x;
-      DFS(Sid->To);
+      Sid->To->Dep = x->Dep + 1;
       for(register unsigned i(0); Sid->To->Fa[i]; ++i) {
         Sid->To->Fa[i + 1] = Sid->To->Fa[i]->Fa[i];
       }
+      DFS(Sid->To);
     }
     Sid = Sid->Nxt;
   }
   x->Back = ++Cnt;
+  Euler[CntEu] = x;
 }
 Node *LCA(Node *x, Node *y) {
-  
+  if(x->Dep < x->Dep) {
+    Node *TmpNd(x), x = y, y = TmpNd;
+  }
+  for (register unsigned i(19); x->Dep > y->Dep; --i) {
+    if(x->Fa[i]) {
+      x = (x->Fa[i]->Dep >= y->Dep) ? x->Fa[i] : x;
+    }
+  }
+  if (x == y) {
+    return x;
+  }
+  for (register unsigned i(19); x->Fa[0] != y->Fa[0]; --i) {
+    if(x->Fa[i] != y->Fa[i]) {
+      x = x->Fa[i], y = y->Fa[i];
+    }
+  }
+  return x->Fa[0];
 }
-void Check(N + x, N + y) {
-  
-}
-void Change() {
-}
+struct Qry {
+  unsigned L, R, Ti, BlockL, BlockR;
+  inline const char operator<(const Qry &x) const {
+    return (this->BlockL ^ x.BlockL) ? (this->BlockL < x.BlockL) : ((this->BlockR ^ x.BlockR) ? (this->BlockR < x.BlockR) : this->Ti < x.Ti);
+  } 
+}Q[100005];
 int main() {
-  // double Ti(clock()), Mti(0);
-  // freopen(".in", "r", stdin);
-  // freopen(".out", "w", stdout);
-//  t = RD();
-//  for (register unsigned T(1); T <= t; ++T){
-//  Clr();
   n = RD(), m = RD(), Q = RD(); 
   for (register unsigned i(1); i <= m; ++i) {
     V[i] = RD();
   }
   for (register unsigned i(1); i <= n; ++i) {
-    W[i] = RD(), SumW[i] = SumW[i - 1] + W[i];
+    W[i] = RD();
   }
   for (register unsigned i(1); i < n; ++i) {
     A = RD();
@@ -102,6 +115,7 @@ int main() {
     Link(N + B, N + A);
   }
   N[1].Dep = 1;
+  N[1].Fa = NULL;
   DFS(N + 1);
   for (register unsigned i(1); i <= Cnt; ++i) {
     printf("%u %lld\n", i, Euler[i]);
@@ -109,16 +123,17 @@ int main() {
   for (register unsigned i(1); i <= Q, ++i) {
     if(RD()) {
       A = RD(), B = RD();
-      Change(N + A, B);
     }
     else {
       A = RD(), B = RD();
-      Check(N + A, N + B);
+      Q[]
     }
   }
   sort(Query + 1, Query + Que + 1);
   for (register unsigned i(1); i <= Que; ++i) {
-    
+    while (Q[0].Ti < Q[i].Ti) {
+      Ans += (Chg[Q[0].Ti]) * ();
+    }
   }
 //  }
   // Ti = clock() - Ti;
