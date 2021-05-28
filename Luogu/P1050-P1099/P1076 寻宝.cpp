@@ -1,54 +1,37 @@
 #include<iostream>
-#include<cstring>
-#include<algorithm>
 #include<cstdio>
-#include<queue>
-#include<vector>
 using namespace std;
-int a[10005][105], cnt[10005], n, m, at, wk, ans;
-bool b[10005][105];
-int read() {//å¿«è¯»æ¨¡å—
-	int ra = 0, rf = 0;
-	char ch = getchar();
-	while (!isdigit(ch)) {//isdigit()å‡½æ•°åˆ¤æ–­chæ˜¯å¦æ˜¯æ•°å­—å­—ç¬¦
-		rf |= ch == '-0';//æœ‰"-"å·å°±è®°å½•
-		ch = getchar();//è·³è¿‡éæ•°å€¼å­—ç¬¦
-	}
-	while (isdigit(ch)) {
-		ra = (ra << 3) + (ra << 1) + (ch ^ 48);//è¿™æ˜¯å¿«é€Ÿä¹˜10å¹¶åŠ æ•°å€¼çš„å†™æ³•
-		ch = getchar();//ç»§ç»­è¯»å…¥
-	}
-	return rf ? -ra : ra;
-}
-int main() {
-	n = read();
-	m = read();
-	for (int i = 1; i <= n; i++) {
-		for (int j = 0; j < m; j++) {
-			b[i][j] = read();
-			a[i][j] = read();
-			if (b[i][j]) {
-				cnt[i]++;
-			}
+int S[10005][105],M,N,At,Hg=1,Cnt[10005]={0};
+long long Sum=0;
+bool Str[10005][105];
+int main()
+{
+//	freopen("faq.in","r",stdin);
+	scanf("%d%d",&N,&M);
+	for(int i=1;i<=N;i++)//²ãÊı 
+	{
+		for(int j=0;j<M;j++)//´ÓÁã¿ªÊ¼±àºÅ 
+		{
+			scanf("%d%d",&Str[i][j],&S[i][j]);
+			if(Str[i][j])//ÓÃ¼ÆÊıÆ÷´æÏÂÃ¿²ãÓĞÂ¥Ìİ·¿¼äÊı 
+				Cnt[i]++;
 		}
 	}
-	at = read();
-	for (int i = 1; i <= n; i++) {
-		wk = a[i][at];
-		ans += wk;
-		ans %= 20123;
-		wk = (wk + 1) % cnt[i] - 1;
-		wk += cnt[i];
-		int ii = at;
-		while (wk) {
-			if (b[i][ii]) {
-				wk--;
-				at = ii;
-			}
-			ii++;
-			ii = ii % m;
+	scanf("%d",&At);
+	while(Hg<=N)//´ÓÒ»Â¥µ½¶¥Â¥ 
+	{
+		Sum+=S[Hg][At];
+		int i=-1;//iÊÇ´ÓAtÍùºóÊıµÄ·¿¼äÊıÁ¿
+		//cout<<At<<S[Hg][At]<<endl; 
+		while(S[Hg][At])
+		{
+			if(Str[Hg][(At+(++i))%M])//×ßµ½ÓĞÂ¥ÌİµÄ·¿¼ä 
+				S[Hg][At]--; 
 		}
+		At=(At+i)%M;
+		//cout<<At<<"	"<<i<<endl;
+		Hg++;//¸üÉÏÒ»²ãÂ¥ 
 	}
-	printf("%d\n", ans);
+	printf("%d\n",Sum%20123);//×îºóÄ£Ò»ÏÂ£¬Êä³ö 
 	return 0;
 }
