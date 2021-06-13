@@ -29,21 +29,14 @@ inline unsigned Qry(unsigned Pos) {
   while (Pos) TmpQ += Tree[Pos], Pos -= Lowbit(Pos);
   return TmpQ;
 }
-inline void Add(unsigned Pos, unsigned Val) {while(Pos <= m) Tree[Pos] += Val, Pos += Lowbit(Pos);} 
-
+inline void Add(unsigned Pos, unsigned Val) {while(Pos <= m) Tree[Pos] += Val, Pos += Lowbit(Pos);}
 inline void Minus(unsigned Pos, unsigned Val) {while(Pos <= m) Tree[Pos] -= Val, Pos += Lowbit(Pos);}
-
 struct Group {
 	unsigned a, b, c, Cnt, Same;
-	inline const char operator<(const Group &x) {
-	  return (this->b ^ x.b) ? (this->b < x.b) : (this->c < x.c);
-  }
+	inline const char operator<(const Group &x) {return this->b < x.b;}
 }G[100005];
-inline const char cmp(const Group &x, const Group &y)  {
-  return (x.a ^ y.a) ? (x.a < y.a) : ((x.b ^ y.b) ? (x.b < y.b) : (x.c < y.c));
-}
+inline const char cmp(const Group &x, const Group &y) {return (x.a ^ y.a) ? (x.a < y.a) : ((x.b ^ y.b) ? (x.b < y.b) : (x.c < y.c));}
 void CDQ(unsigned L, unsigned R) {
-//  printf("CDQ [%u, %u]\n", L, R);
   if(L == R) return; 
   register unsigned Mid((L + R) >> 1);
   CDQ(L, Mid);
@@ -53,23 +46,17 @@ void CDQ(unsigned L, unsigned R) {
   register unsigned PointerL(L), PointerR(Mid + 1);
   while (PointerR <= R) {
     while (G[PointerL].b <= G[PointerR].b && PointerL <= Mid) Add(G[PointerL].c, G[PointerL].Same), ++PointerL;
-    G[PointerR].Cnt += Qry(G[PointerR].c),++PointerR;
+    G[PointerR].Cnt += Qry(G[PointerR].c), ++PointerR;
   }
   while (PointerL > L) --PointerL, Minus(G[PointerL].c, G[PointerL].Same);
-//  printf("Cnt1 %u\n", Cnt[1]);
 }
 int main() {
-	// double Ti(clock()), Mti(0);
-//	 freopen("P3810_2.in", "r", stdin);
-//	 freopen("P3810.out", "w", stdout);
 	n = RD(), m = RD();
 	for (register unsigned i(1); i <= n; ++i) G[i].a = RD(), G[i].b = RD(), G[i].c = RD();
 	sort(G + 1, G + n + 1, cmp);
 	for (register unsigned i(1); i <= n; ++i) {if((G[i].a ^ G[i - 1].a) || (G[i].b ^ G[i - 1].b) || (G[i].c ^ G[i - 1].c)) G[++NM] = G[i]; ++(G[NM].Same);}
-//	for (register unsigned i(1); i <= NM; ++i) printf("%u Same %u\n", i, G[i].Same);
   CDQ(1, NM);
 	for (register unsigned i(1); i <= NM; ++i) Ans[G[i].Cnt + G[i].Same - 1] += G[i].Same;
 	for (register unsigned i(0); i < n; ++i) printf("%u\n", Ans[i]);
-
 	return Wild_Donkey;
 }
