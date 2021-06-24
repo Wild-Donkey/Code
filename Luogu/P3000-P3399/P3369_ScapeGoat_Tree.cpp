@@ -38,21 +38,21 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned Stack[100005], Hd(0), m, n, Cnt(0), A, C, D, t, TmpD(0x3f3f3f3f);
-int Ans, B;
+unsigned Stack[100005], Hd(0), m, n, Cnt(0), A, D, t, TmpD(0x3f3f3f3f);
+int Ans, B, C;
 char TmpNT(0), TmpTg(0);
 struct Node {
   Node *LS, *RS;
   int Value;
-  unsigned RealSize, Size;
+  unsigned Size;
   char Tag;
 }N[100005], *PntStk[100005], *CntN(N), *Root(N), *TmpN, *TmpNF, *TmpF;
 inline void Print (Node *x) {
-  printf("Point %u Val %u\nReal %u Size %u\nTag %u LS %u RS %u\n\n", x - N, x->Value, x->RealSize, x->Size, x->Tag, x->LS - N, x->RS - N);
+  printf("Point %u Val %u\nReal %u Size %u\nTag %u LS %u RS %u\n\n", x - N, x->Value, x->Size, x->Tag, x->LS - N, x->RS - N);
 }
 Node *Build(unsigned L, unsigned R) {
   if(L == R) {
-    PntStk[Hd]->LS = PntStk[Hd]->RS = NULL, PntStk[Hd]->Value = Stack[L], PntStk[Hd]->RealSize = PntStk[Hd]->Size = 1;
+    PntStk[Hd]->LS = PntStk[Hd]->RS = NULL, PntStk[Hd]->Value = Stack[L], PntStk[Hd]->Size = 1;
     return PntStk[Hd--];
   }
   register unsigned Mid((L + R) >> 1);
@@ -66,7 +66,6 @@ Node *Build(unsigned L, unsigned R) {
   }
   x->RS = Build(Mid + 1, R);
   x->Size += x->RS->Size;
-  x->RealSize = x->Size;
   return x;
 }
 inline void DFS(Node *x) {
@@ -84,6 +83,7 @@ inline void DFS(Node *x) {
 }
 Node *Rebuild(Node *x) {
 //  printf("Rebuild %u\n", x - N);
+  if(!(x->Size)) {printf("Caonima %u\n", x - N);return NULL;}
   Hd = 0;
   DFS(x);
 //  putchar('\n');
@@ -92,7 +92,7 @@ Node *Rebuild(Node *x) {
 void Insert(Node *x) {
 //  printf("Insert ");
 //  Print(x);
-  ++(x->Size), ++(x->RealSize);
+  ++(x->Size);
 //  printf("x %u TmpF %u TmpT %u\n", x - N, TmpF - N, TmpTg);
   register Node *TmpofTmp(TmpF);
   register char TmpofTmpTg(TmpTg);
@@ -101,7 +101,7 @@ void Insert(Node *x) {
     if(!(x->RS)) {
       x->RS = ++CntN;
       x->RS->Value = B;
-      x->RS->RealSize = x->RS->Size = 1;
+      x->RS->Size = 1;
     } else {
       TmpTg = 1, Insert(x->RS);
     }
@@ -109,75 +109,49 @@ void Insert(Node *x) {
     if(!(x->LS)) {
       x->LS = ++CntN;
       x->LS->Value = B;
-      x->LS->RealSize = x->LS->Size = 1;
+      x->LS->Size = 1;
     } else {
       TmpTg = 0, Insert(x->LS);
     }
   }
-  if(x->RealSize > 3) {
+  if(x->Size) {
 //    printf("Do x %u TmpF %u TmpT %u\n", x - N, TmpofTmp - N, TmpofTmpTg);
     if((!(x->LS)) || (!(x->RS))) {
       TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
       return;
     }
-    if((x->LS->RealSize * 3 < x->RS->RealSize) || (x->RS->RealSize * 3 < x->LS->RealSize)) {
+    if((x->LS->Size * 3 < x->RS->Size) || (x->RS->Size * 3 < x->LS->Size)) {
       TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
       return;
-    }
-    if(x->Size * 4 < x->RealSize * 3) {
-      TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
     }
   }
 }
 void Delete(Node *x) {
-  if(x->Value == B) {
-    x->Tag = 1, --(x->Size);
-    return;
-  }
   register Node *TmpofTmp(TmpF);
   register char TmpofTmpTg(TmpTg);
   TmpF = x;
-  if(x->Value < B) {
-    if(x->RS) {
-      TmpTg = 1;
-      x->Size -= x->RS->Size;
-      Delete(x->RS);
-      x->Size += x->RS->Size;
+  if(x->LS) {
+    if(x->LS->Size >= B) {
+      TmpTg = 0, x->Size -= x->LS->Size, Delete(x->LS), x->Size += x->LS->Size;
+      return;
     }
-  } else {
-    if(x->LS) {
-      TmpTg = 0;
-      x->Size -= x->LS->Size;
-      Delete(x->LS);
-      x->Size += x->LS->Size;
+    else {
+      B -= x->LS->Size;
     }
   }
-  if(x->LS) {
-    if(!(x->LS->Size)){
-      x->RealSize -= x->LS->RealSize;
-      x->LS = NULL;
+  if(!(x->Tag)) {
+    if(B == 1) {
+      if(x->Value == C) {
+        x->Tag = 1, --x->Size;
+      }
+      return;
     }
+    else --B;
   }
   if(x->RS) {
-    if(!(x->RS->Size)){
-      x->RealSize -= x->RS->RealSize;
-      x->RS = NULL;
-    }
+    TmpTg = 1, x->Size -= x->RS->Size, Delete(x->RS), x->Size += x->RS->Size;
+    return;
   }
-  if(x->RealSize > 3) {
-    if((!(x->LS)) || (!(x->RS))) {
-      TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
-      return;
-    }
-    if((x->LS->RealSize * 3 < x->RS->RealSize) || (x->RS->RealSize * 3 < x->LS->RealSize)) {
-      TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
-      return;
-    }
-    if(x->Size * 4 < x->RealSize * 3) {
-      TmpN = x, TmpNF = TmpofTmp, TmpNT = TmpofTmpTg;
-    }
-  }
-  return;
 }
 void Rank (Node *x) {
 //  printf("Rank %u %u\n\n", x - N, Ans);
@@ -195,16 +169,18 @@ void Find(Node *x) {
   if(x->RS) return Find(x->RS);
 }
 int main() {
+//  freopen("P3369_7.in", "r", stdin); 
+//  freopen("P3369.out", "w", stdout); 
   n = RD();
-  N[0].Value = 0x3f3f3f3f, N[0].RealSize = N[0].Size = 1;  
+  N[0].Value = 0x3f3f3f3f, N[0].Size = 1;  
   for (register unsigned i(1); i <= n; ++i) {
     A = RD();
     B = RDsg();
+//    printf("%u %u %u\n", i, A, B);
     switch(A) {
       case 1:{
         TmpN = NULL, Insert(Root);
         if(TmpN) {
-//          printf("TmpN %u TmpF %u TmpT %u\n", TmpN - N, TmpNF - N, TmpNT);
           if(TmpN == Root) {
             Root = Rebuild(TmpN);
             break;
@@ -218,7 +194,7 @@ int main() {
         break;
       }
       case 2:{
-        TmpN = NULL, Delete(Root);
+        Ans = 1, C = B, Rank(Root), B = Ans, TmpN = NULL, Delete(Root);
         if(TmpN) {
           if(TmpN == Root) {
             Root = Rebuild(TmpN);
@@ -237,6 +213,7 @@ int main() {
       case 5:{Ans = 0, Rank(Root), B = Ans, Find(Root);break;}
       case 6:{++B, Ans = 1, Rank(Root), B = Ans, Find(Root);break;}
     }
+//    if(A >= 3) if (Ans == 741921) printf("%u %u %d\n", i, A, Ans);
     if(A >= 3) printf("%d\n", Ans);
   }
   return Wild_Donkey;
