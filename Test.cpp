@@ -50,8 +50,7 @@ int main() {
   //  Clr();
   //  n = RD();
   for (register unsigned i(1); i <= 1000; ++i) {
-    for (register unsigned j(1); j <= 1000000000; ++j) {
-    }
+    for (register unsigned j(1); j <= 1000000000; ++j) {}
     printf("%llu\n", i * (unsigned long long)1000000000);
   }
   //  }
@@ -63,9 +62,13 @@ int main() {
   return Wild_Donkey;
 }
 // Luogu Online IDE with O2 0.062s
+// 2021 ASUS vivobook with r7-5800H at Quiet Mode with AC power c++11 -O2 1.243s
+// 2021 ASUS vivobook with r7-5800H at Quiet Mode with AC power -O2 1.262s
 // LCEZ's Lenovo Computer with i3-4170 O2 1.361s
-// 2012 ASUS with o2 2.326s
+// 2012 ASUS -O2 2.326s
+
 // Wild_Donkey's Main PC with r7-3700X 233.7s
+// 2021 ASUS vivobook with r7-5800H at Quiet Mode with AC power 241.9s
 // LCEZ's Lenovo Computer with i3-4170 294.4s
 // SDSY's Huawei Laptop with i7-4790H 303s
 // Actinoi MAC Book 1116.4s

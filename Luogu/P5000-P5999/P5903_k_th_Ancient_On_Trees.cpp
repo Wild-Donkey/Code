@@ -47,7 +47,7 @@ char Short(1);
 struct Node {
   Node *Fa[20], *Son, *Bro, *LonSon, *Top;
   unsigned Len, DFSr, Deep;
-}N[500005], *Root, *Top[800];
+}N[500005], *Root, *Top[500005];
 void Link(Node *x, Node *y) {
   y->Bro = x->Son, x->Son = y;
 }
@@ -89,7 +89,7 @@ void DFS2(Node *x) {
 }
 signed main() {
   // double Ti(clock()), Mti(0);
-  // freopen(".in", "r", stdin);
+//  freopen("P5903_4.in", "r", stdin);
   // freopen(".out", "w", stdout);
 //  t = RD();
 //  for (register unsigned T(1); T <= t; ++T){
@@ -107,9 +107,9 @@ signed main() {
   DFS1(Root), DFS2(Root);
   for (register unsigned i(1), L, R; i <= Hd; ++i) {
     register Node *x(Top[i]);
-//    printf("%u %u\n", i, x   - N);
+//    printf("%u %u\n", i, x - N);
     L = x->DFSr, R = L + x->Len - 1;
-    for (register unsigned j(L); i <= R; ++j) {
+    for (register unsigned j(L); j <= R; ++j) {
       List[j] = x - N;
       if(x->Fa[0]) x = x->Fa[0];
       else break;
