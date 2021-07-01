@@ -38,28 +38,25 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned n, f[100005], g[330][100005], Sq, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0), p;
+unsigned a[10005], m, n, f[5005][5005], Cnt(0), A, B, C, D, t, Ans(0), Tmp(0), p;
+bool b[10005];
 inline void Clr() {}
 int main() {
-  n = RD(), p = RD(), Sq = sqrt(n) + 1;
-  f[0] = 1;
-  for (register unsigned j(1); j <= Sq; ++j) {
-    for (register unsigned i(j); i <= n; ++i) {
-      f[i] += f[i - j];
-      if(f[i] >= p) f[i] -= p;
+  n = RD(), p = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    f[i][i] = 1;
+  }
+  for (register unsigned i(2); i <= n; ++i) {
+    for (register unsigned j(1); j < i; ++j) {
+      for (register unsigned k(1); k <= j; ++k) {
+        f[i][j] += f[i - j][k];
+        if(f[i][j] >= p) f[i][j] -= p;
+      }
     }
   }
-  g[0][0] = 1;
-  for (register unsigned i(1); i <= Sq; ++i) {
-    for (register unsigned j(i); j <= n; ++j) {
-      g[i][j] = g[i - 1][j - 1] + g[i][j - i];
-      if(g[i][j] >= p) g[i][j] -= p;
-    }
-  }
-  for (register unsigned i(0); i * (Sq + 1) <= n; ++i) {
-    for (register unsigned j(i * (Sq + 1)); j <= n; ++j) {
-      Ans = ((unsigned long long)g[i][j - Sq * i] * f[n - j] + Ans) % p;
-    }
+  for (register unsigned i(1); i <= n; ++i) {
+    Ans += f[n][i];
+    if(Ans >= p) Ans -= p;
   }
   printf("%u\n", Ans);
   return Wild_Donkey;
