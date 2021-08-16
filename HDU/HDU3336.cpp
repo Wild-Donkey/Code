@@ -50,22 +50,22 @@ inline void Clr() {
 }
 int main() {
   // double Ti(clock()), Mti(0);
-//   freopen("P3375_11.in", "r", stdin);
-//   freopen("P3375.out", "w", stdout);
+  //   freopen("P3375_11.in", "r", stdin);
+  //   freopen("P3375.out", "w", stdout);
   t = RD();
-  for (register unsigned T(1); T <= t; ++T){
+  for (register unsigned T(1); T <= t; ++T) {
     Clr();
-    for (register unsigned i(2), k(1); i <= n; ++i)  { // Origin_Len
+    for (register unsigned i(2), k(1); i <= n; ++i) {  // Origin_Len
       while (((A[k] ^ A[i]) && k > 1) || k > i) {
         k = Nxt[k - 1] + 1;
       }
-      if(A[k] == A[i]) {
+      if (A[k] == A[i]) {
         Nxt[i] = k;
         Dep[i] = Dep[k] + 1;
         Ans = (Ans + Dep[i]) % MOD;
         ++k;
       }
-//      printf("%u %u\n", Nxt[i], Dep[i]);
+      //      printf("%u %u\n", Nxt[i], Dep[i]);
     }
     printf("%u\n", Ans);
   }
