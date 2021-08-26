@@ -35,7 +35,9 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+long long a[10005], f[10005], Ans(0);
+unsigned  m, n, Cnt(0), A, B, C, D, t, Tmp(0);
+char Cs[10005];
 //  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -45,8 +47,34 @@ signed main() {
   //  Clr();
   n = RD();
   for (register unsigned i(1); i <= n; ++i) {
-    a[i] = RD();
+    a[i] = RDsg(), f[i] = 0xafafafafafafafaf;
   }
-  //  system("pause");
+  f[0] = 0;
+  for (register unsigned i(1); i <= n; ++i) {
+    for (register unsigned j(i); j; --j) {
+      if (f[j] < f[j - 1] + j * a[i]) f[j] = f[j - 1] + j * a[i], Cs[j] = 1;
+      else Cs[j] = 0;
+    }
+    printf("\nF_%3u\n", i);
+    // for (register unsigned j(1); j <= i; ++j) {
+    //   printf("f[%u][%u] = %d ", i, j, f[j]), printf("Dif = %d ", f[j] - f[j - 1]);
+    // }
+    for (register unsigned j(1); j <= i; ++j) {
+      printf("%5d ", f[j]);
+    }
+    // for (register unsigned j(1); j <= i; ++j) {
+    //   printf("%u Cs ?%u \n", j, Cs[j]);
+    // }
+    putchar('\n');
+  }
+  for (register unsigned i(1); i <= n; ++i) Ans = max(Ans, f[i]);
+  printf("%d\n", Ans);
+  system("pause");
   return Wild_Donkey;
 }
+/*
+5
+-2 -8 0 5 -3
+5
+8 2 10 15 7
+*/
