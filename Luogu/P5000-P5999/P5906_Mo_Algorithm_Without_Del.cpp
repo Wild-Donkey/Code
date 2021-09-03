@@ -54,7 +54,7 @@ void ClrA() {
 }
 unsigned ClrL() {
   register unsigned ClAns;
-  while (STop) Fst[S[STop].Pos] = S[STop].Val1, Lst[S[STop].Pos] = S[STop].Val2, ClAns = S[--STop].MxAns;
+  while (STop) Fst[S[STop].Pos] = S[STop].Val1, Lst[S[STop].Pos] = S[STop].Val2, ClAns = S[STop--].MxAns;
   return ClAns;
 }
 signed main() {
@@ -68,18 +68,14 @@ signed main() {
   sort(b + 1, b + n + 1), ValMx = unique(b + 1, b + n + 1);
   for (register unsigned i(1); i <= n; ++i) a[i] = lower_bound(b + 1, ValMx, a[i]) - b;
   m = RD(), BlcLen = (n / sqrt(m)) + 1;
+  // printf("BlcLen %u\n", BlcLen);
   for (register unsigned i(1); i <= m; ++i) Q[i].L = RD(), Q[i].R = RD(), Q[i].Num = i, Q[i].Bel = Q[i].L / BlcLen;
   sort(Q + 1, Q + m + 1);
-  for (register unsigned i(1), NowL(1), NowR(0), NowAns(0), NowBack(BlcLen - 1); i <= m; ++i) {
+  for (register unsigned i(1), NowL(1), NowR(0), NowAns(0); i <= m; ++i) {
     // printf("Now [%u, %u]\n", Q[i].L, Q[i].R);
-    if (NowR < NowL) NowAns = 0, NowL = min(((Q[i].L / BlcLen) + 1) * BlcLen, Q[i].R + 1), NowR = NowL - 1;
-    else {
-      if (Q[i - 1].Bel ^ Q[i].Bel) ClrA(), NowL = min(((Q[i].L / BlcLen) + 1) * BlcLen, Q[i].R + 1), NowR = NowL - 1, NowAns = 0;
-      else {
-        NowL += STop, NowAns = ClrL();
-        if (NowR < NowL) NowL = min(((Q[i].L / BlcLen) + 1) * BlcLen, Q[i].R + 1), NowR = NowL - 1;
-      }
-    }
+    if (Q[i - 1].Bel ^ Q[i].Bel) ClrA(), NowL = Q[i].R + 1, NowR = NowL - 1;
+    NowL += STop, NowAns = ClrL();
+    if (NowR < NowL) NowL = min((Q[i].Bel + 1) * BlcLen, Q[i].R + 1), NowR = NowL - 1, NowAns = 0;
     while (NowR < Q[i].R) {
       // printf("DoR [%u, %u] %u %u Ans %u\n", NowL, NowR, a[NowR + 1], Fst[a[NowR + 1]], NowAns);
       ++NowR, Lst[a[NowR]] = NowR;
