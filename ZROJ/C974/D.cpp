@@ -38,7 +38,7 @@ inline int RDsg() {
 struct Edge;
 struct Node {
   Edge* Fst;
-  unsigned Deg, OldDeg;
+  unsigned Deg, OldDeg, Pos;
   char Vis;
 }N[1000005], * Q[1000005];
 struct Edge {
@@ -47,16 +47,12 @@ struct Edge {
 }E[2000005];
 long long Tmp(0), Ans(0xafafafafafafafaf), V1, V2, V3, Ans1, Ans2, Ans3;
 unsigned Ansk, m, n, Cnt(0), A, B, C, D, t, Still(0);
-unsigned Hd, Tl;
-void DFS(Node* x) {
-  // printf("DFS %u\n", x - N);
-  Edge* Sid(x->Fst);
-  x->Vis = 1, ++Ans1, Ans2 += x->Deg, Ans3 += x->OldDeg - x->Deg;
-  while (Sid) {
-    // printf("Sid %u To %u\n", Sid - E, Sid->To - N);
-    if (!(Sid->To->Vis))/* printf("%u????\n", Sid->To - N), */DFS(Sid->To);
-    Sid = Sid->Nxt;
-  }
+unsigned Bucket[1000005], BucketSize(0), List[1000005];
+unsigned PntCnt[1000005], SidCnt[1000005], DegCnt[1000005], Stack[1000005], Top;
+unsigned Find(unsigned x) {
+  while (x ^ Bucket[x]) Stack[++Top] = x, x = Bucket[x];
+  while (Top) Bucket[Stack[Top--]] = x;
+  return x;
 }
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -77,39 +73,62 @@ signed main() {
     // printf("Link %u %u %u %u %u %u\n", i, i ^ 1, E[i].Nxt - E, E[i ^ 1].Nxt - E, N[A].Fst - E, N[B].Fst - E);
     ++(N[A].Deg), ++(N[B].Deg), ++(N[A].OldDeg), ++(N[B].OldDeg);
   }
-  DFS(N + 1);
-  for (unsigned i(1); Still;++i) {
-    Hd = Tl = 0;
-    // printf("Degree %u %u\n", i, Still);
-    for (unsigned j(1); j <= n; ++j)
-      if (N[j].Deg == i - 1) Q[++Tl] = N + j, N[j].Vis = 1;
-      else if (N[j].Deg >= i) N[j].Vis = 0;
-    while (Hd ^ Tl) {
-      Node* Now(Q[++Hd]);
-      --Still;
-      Edge* Sid(Now->Fst);
-      // printf("BFS %u Still %u\n", Now - N, Still);
-      while (Sid) {
-        // printf("%u\n", Sid - E);
-        if (!(Sid->To->Vis)) {
-          --(Sid->To->Deg);
-          if (Sid->To->Deg < i) Sid->To->Vis = 1, Q[++Tl] = Sid->To;
-        }
-        Sid = Sid->Nxt;
+  for (unsigned i(1); i <= n; ++i) ++Bucket[N[i].Deg], BucketSize = max(BucketSize, N[i].Deg);
+  for (unsigned i(1); i <= BucketSize; ++i) Bucket[i] += Bucket[i - 1];
+  for (unsigned i(1); i <= n; ++i) N[i].Pos = Bucket[N[i].Deg]--, List[N[i].Pos] = i;
+  for (unsigned i(1); i <= n; ++i) {
+    Node* Now(N + List[i]);
+    Edge* Sid(Now->Fst);
+    while (Sid) {
+      if (Sid->To->Deg > Now->Deg) {
+        Tmp = Sid->To->Pos;
+        Sid->To->Pos = ++Bucket[Sid->To->Deg];
+        N[List[Bucket[Sid->To->Deg]]].Pos = Tmp;
+        List[Tmp] = List[Bucket[Sid->To->Deg]];
+        List[Bucket[(Sid->To->Deg)--]] = Sid->To - N;
       }
+      Sid = Sid->Nxt;
     }
-    for (unsigned j(1); j <= n; ++j) {
-      if (!(N[j].Vis)) {
-        Ans1 = Ans2 = Ans3 = 0;
-        DFS(N + j);
-        Ans2 >>= 1, Tmp = (Ans1 * V1) + (Ans2 * V2) + (Ans3 * V3);
-        printf("A1 %lld A2 %lld A3 %lld Tmp %lld Ans %lld\n", Ans1, Ans2, Ans3, Tmp, Ans);
-        if (Tmp >= Ans) Ans = Tmp, Ansk = i;
+  }
+  // for (unsigned i(1); i <= n; ++i) printf("%u %u %u\n", List[i], N[List[i]].Deg, N[List[i]].Pos);
+  for (unsigned i(n); i; --i) Bucket[i] = i, PntCnt[i] = 1, DegCnt[i] = N[List[i]].OldDeg;
+  for (unsigned i(n); i; --i) {
+    Node* Now(N + List[i]);
+    Edge* Sid(Now->Fst);
+    unsigned NowRoot(Find(Now->Pos));
+    while (Sid) {
+      if (Sid->To->Pos >= Now->Pos) {
+        A = Find(Sid->To->Pos);
+        if (A ^ NowRoot) {
+          if (PntCnt[A] < PntCnt[NowRoot]) {
+            Bucket[A] = NowRoot;
+            PntCnt[NowRoot] += PntCnt[A];
+            DegCnt[NowRoot] += DegCnt[A];
+            SidCnt[NowRoot] += SidCnt[A];
+          }
+          else {
+            Bucket[NowRoot] = A;
+            PntCnt[A] += PntCnt[NowRoot];
+            DegCnt[A] += DegCnt[NowRoot];
+            SidCnt[A] += SidCnt[NowRoot];
+            NowRoot = A;
+          }
+        }
+        ++SidCnt[NowRoot];
+      }
+      Sid = Sid->Nxt;
+    }
+    if (N[List[i - 1]].Deg ^ Now->Deg) {
+      for (unsigned j(i); N[List[j]].Deg == Now->Deg; ++j) {
+        unsigned Calc(Find(j));
+        Tmp = V1 * PntCnt[Calc] + V2 * SidCnt[Calc] + V3 * (DegCnt[Calc] - (SidCnt[Calc] << 1));
+        // printf("%u %u %u %u %lld\n", Calc, PntCnt[Calc], SidCnt[Calc], DegCnt[Calc] - (SidCnt[Calc] << 1), Tmp);
+        if (Tmp >= Ans) Ans = Tmp, Ansk = Now->Deg;
       }
     }
   }
   printf("%u %lld\n", Ansk, Ans);
-  system("pause");
+  // system("pause");
   return Wild_Donkey;
 }
 /*
@@ -118,25 +137,25 @@ signed main() {
 1 2
 2 9
 3 4
-10 5
 3 6
-4 6
-4 7
-7 8
-6 8
-4 8
-3 8
 3 7
+3 8
 3 9
 3 10
-9 10
-10 4
+4 6
+4 7
+4 8
+4 10
+5 10
+6 8
+7 8
 7 11
 7 12
+8 15
+9 10
 11 12
 12 13
 13 14
-8 15
 15 16
 15 17
 15 18

@@ -41,19 +41,19 @@ unsigned m, n, Have[1000005], Ask[1005][1005];
 char InTmp[15], Flg(0), QAns(0);
 struct Node {
   Node* LS, * RS;
-}N[20000005], * CntN(N), * Last(N), * Root[1000005];
+}N[200005], * CntN(N), * Last(N), * Root[1005];
 void Hash() {
   char StrPos(0); ++Cnt;
   while (InTmp[StrPos] < 'a') ++StrPos;
   while (InTmp[StrPos] >= 'a') b[Cnt] = b[Cnt] * 27 + InTmp[StrPos] - '`', InTmp[StrPos++] = 0;
 }
-void Add(Node* x, unsigned L, unsigned R) {
+void Add(Node* x, unsigned short L, unsigned short R) {
   if (L == R) return;
   unsigned Mid((L + R) >> 1);
-  if (A <= Mid) { if (!(x->LS)) x->LS = ++CntN; Add(x->LS, L, Mid); }
-  else { if (!(x->RS)) x->RS = ++CntN;  Add(x->RS, Mid + 1, R); }
+  if (A <= Mid) { if (x->LS < x) { if (x->LS) *(++CntN) = *(x->LS); else *(++CntN) = *N; x->LS = CntN; } Add(x->LS, L, Mid); }
+  else { if (x->RS < x) { if (x->RS) *(++CntN) = *(x->RS); else *(++CntN) = *N; x->RS = CntN; }  Add(x->RS, Mid + 1, R); }
 }
-void Merge(Node* x, Node* y, unsigned L, unsigned R) {
+void Merge(Node* x, Node* y, unsigned short L, unsigned short R) {
   // printf("%u <- %u [%u, %u]\n", x - N, y - N, L, R);
   if (L == R) { Flg = 1; return; }
   unsigned Mid((L + R) >> 1);
@@ -66,7 +66,7 @@ void Merge(Node* x, Node* y, unsigned L, unsigned R) {
     else x->RS = y->RS;
   }
 }
-void Qry(Node* x, unsigned L, unsigned R) {
+void Qry(Node* x, unsigned short L, unsigned short R) {
   if (L == R) { QAns = 1;return; }
   unsigned Mid((L + R) >> 1);
   if (A <= Mid) { if (x->LS) return Qry(x->LS, L, Mid); }
@@ -80,7 +80,7 @@ signed main() {
   //  for (register unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD();
-  for (unsigned i(1); i <= n; ++i) {
+  for (unsigned short i(1); i <= n; ++i) {
     scanf("%s", &InTmp), Hash(), a[i][++a[i][0]] = b[Cnt], scanf("%s", &InTmp);
     for (;;) {
       scanf("%s", &InTmp);
@@ -89,9 +89,9 @@ signed main() {
     }
   }
   sort(b + 1, b + Cnt + 1), CntB = unique(b + 1, b + Cnt + 1);
-  for (unsigned i(1); i <= n; ++i) {
+  for (unsigned short i(1); i <= n; ++i) {
     Ask[i][0] = a[i][0];
-    for (unsigned j(1); j <= a[i][0]; ++j) {
+    for (unsigned short j(1); j <= a[i][0]; ++j) {
       Ask[i][j] = lower_bound(b + 1, CntB, a[i][j]) - b;
       // printf("%u ", Ask[i][j]);
     }
@@ -106,23 +106,19 @@ signed main() {
       for (unsigned short j(2); j <= Ask[i][0]; ++j)
         if (!Have[Ask[i][j]]) { Flg = 1; break; }
       if (!Flg) {
-        if (!Root[Ask[i][1]]) Root[Ask[i][1]] = ++CntN;
+        Root[i] = ++CntN, * CntN = *N;
         sort(Ask[i] + 2, Ask[i] + Ask[i][0] + 1, Cmp);
         for (unsigned short j(2); j <= Ask[i][0]; ++j) {
-          QAns = 0, A = Ask[i][j], Qry(Root[Ask[i][1]], 1, Size);
+          QAns = 0, A = Have[Ask[i][j]], Qry(Root[i], 1, n);
           if (QAns) continue;
-          Merge(Root[Ask[i][1]], Root[Ask[i][j]], 1, Size);
-          Add(Root[Ask[i][1]], 1, Size);
+          if (Root[Have[Ask[i][j]]]) Merge(Root[i], Root[Have[Ask[i][j]]], 1, n);
           if (Flg) break;
+          A = Have[Ask[i][j]], Add(Root[i], 1, n);
         }
-      }
-      if (!Flg) {
-        for (unsigned short j(2); j <= Ask[i][0]; ++j)
-          A = Ask[i][j];
       }
     }
     if (!Flg) Have[Ask[i][1]] = i;
-    // else CntN = Last;
+    else { CntN = Last; if (!(Have[Ask[i][1]])) Root[i] = NULL; }
     printf(Flg ? "greska\n" : "ok\n");
   }
   // system("pause");
@@ -130,8 +126,8 @@ signed main() {
 }
 /*
 4
-a : ;
-b : a ;
-c : b ;
-d : b c ;
+asdlffkjfj : ;
+bkdfgkufdg : asdlffkjfj ;
+cdkfugdfgr : bkdfgkufdg ;
+dieurhhgfd : bkdfgkufdg cdkfugdfgr ;
 */
