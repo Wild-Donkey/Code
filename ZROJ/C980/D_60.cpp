@@ -42,15 +42,18 @@ void Manacher(unsigned* f1, unsigned* f2) {
     f1[k] = l;
     if (k + l > Ri) Ri = k + l - 1, m = k;
   }
-  // for (unsigned k(1); k <= n; ++k) printf("%u %u\n", k, f1[k]);
+  // printf("F1\n");
+  // for (unsigned k(1); k <= n; ++k) printf("%u ", f1[k]);
   for (unsigned k(2), Ri(0), l, m(0); k <= n; ++k) {
     if (k >= Ri) l = 0;
-    else l = min(Ri - k, f2[(m << 1) - k - 1]);
+    else l = min(Ri - k + 1, f2[(m << 1) - k]);
     while (a[k + l] == a[k - l - 1]) ++l;
     f2[k] = l;
     if (k + l > Ri) Ri = k + l - 1, m = k;
   }
-  // for (unsigned k(1); k <= n; ++k) printf("%u %u\n", k, f2[k]);
+  // printf("\nF2\n");
+  // for (unsigned k(1); k <= n; ++k) printf("%u ", f2[k]);
+  // putchar('\n');
   for (unsigned k(1); k <= n; ++k) Tmp += f1[k] + f2[k];
   Ans = max(Ans, Tmp);
 }
@@ -83,6 +86,6 @@ signed main() {
   }
   printf("%llu\n", Ans);
   //  }
-  // system("pause");
+  system("pause");
   return Wild_Donkey;
 }

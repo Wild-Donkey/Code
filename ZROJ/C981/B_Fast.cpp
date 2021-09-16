@@ -30,35 +30,32 @@ inline int RDsg() {
 }
 long long Ans(0x3f3f3f3f3f3f3f3f), Tmp1(0), Tmp2(0);
 long long Left, Right, Tmp;
-unsigned m, n, Pos;
+unsigned m, n, Pos, Cnt(0);
 unsigned A, B, C, D, t;
-unsigned Cnt(0);
 unsigned Range[1000005][2], End[1000005];
 struct Node {
   Node* LS, * RS;
-  long long ValUp, ValDown, Tag1, Tag2;
+  long long ValUp, ValDown;
 }N[2000005], * CntN(N);
 void PushDown(Node* x) {
-  if (x->Tag1 <= 0x3f3f3f3f3f3f3f3f) {
-    x->LS->ValUp = x->RS->ValUp = x->Tag1;
-    x->LS->Tag1 = x->RS->Tag1 = x->Tag1, x->Tag1 = 0x4000000000000000;
-    x->LS->ValDown = x->RS->ValDown = x->Tag2;
-    x->LS->Tag2 = x->RS->Tag2 = x->Tag2, x->Tag2 = 0x4000000000000000;
+  if (x->ValUp <= 0x3f3f3f3f3f3f3f3f) {
+    x->LS->ValUp = x->RS->ValUp = x->ValUp;
+    x->LS->ValDown = x->RS->ValDown = x->ValDown;
+    x->ValUp = x->ValDown = 0x4000000000000000;
   }
 }
 void Build(Node* x, unsigned L, unsigned R) {
-  x->Tag1 = x->Tag2 = 0x4000000000000000;
+  x->ValUp = x->ValDown = 0x4000000000000000;
   if (L == R) { x->ValUp = L * Left, x->ValDown = -L * Right;return; }
   unsigned Mid((L + R) >> 1);
-  Build(x->LS = ++CntN, L, Mid);
-  Build(x->RS = ++CntN, Mid + 1, R);
+  Build(x->LS = ++CntN, L, Mid), Build(x->RS = ++CntN, Mid + 1, R);
 }
 void Change(Node* x, unsigned L, unsigned R) {
-  if ((A <= L) && (R <= B)) { x->ValUp = x->Tag1 = Tmp1, x->ValDown = x->Tag2 = Tmp2; return; }
+  if ((A <= L) && (R <= B)) { x->ValUp = Tmp1, x->ValDown = Tmp2; return; }
   unsigned Mid((L + R) >> 1);
   PushDown(x);
-  if (A <= Mid) { Change(x->LS, L, Mid); }
-  if (B > Mid) { Change(x->RS, Mid + 1, R); }
+  if (A <= Mid) Change(x->LS, L, Mid);
+  if (B > Mid) Change(x->RS, Mid + 1, R);
 }
 void Find(Node* x, unsigned L, unsigned R) {
   if (L == R) { Tmp = min(x->ValUp - L * Left, x->ValDown + L * Right); return; }
@@ -70,16 +67,9 @@ void Find(Node* x, unsigned L, unsigned R) {
 void Print(Node* x, unsigned L, unsigned R) {
   if (L == R) { Ans = min(Ans, min(x->ValUp - L * Left, x->ValDown + L * Right)); return; }
   unsigned Mid((L + R) >> 1);
-  PushDown(x);
-  Print(x->LS, L, Mid);
-  Print(x->RS, Mid + 1, R);
+  PushDown(x), Print(x->LS, L, Mid), Print(x->RS, Mid + 1, R);
 }
 signed main() {
-  //  freopen(".in", "r", stdin);
-  //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
   n = RD(), Left = RD(), Right = RD();
   for (unsigned i(1); i <= n; ++i) {
     End[i] = End[i - 1] + RD();
@@ -93,7 +83,6 @@ signed main() {
     if (A <= B) {
       Pos = B + 1, Find(N, 1, m), Tmp1 = Tmp + (B + 1) * Left;
       Tmp2 = 0x3f3f3f3f3f3f3f3f, Change(N, 1, m);
-      // printf("Change To %lld & %lld\n", Tmp1, Tmp2);
     }
     for (unsigned j(End[i - 1] + 1); j < End[i]; ++j) {
       A = Range[j][1] + 1, B = Range[j + 1][0] - 1;
@@ -101,30 +90,15 @@ signed main() {
         Pos = A - 1, Find(N, 1, m), Tmp2 = Tmp - (A - 1) * Right;
         Pos = B + 1, Find(N, 1, m), Tmp1 = Tmp + (B + 1) * Left;
         Change(N, 1, m);
-        // printf("Change To %lld & %lld\n", Tmp1, Tmp2);
       }
     }
     A = Range[End[i]][1] + 1, B = m;
     if (A <= B) {
       Pos = A - 1, Find(N, 1, m), Tmp2 = Tmp - (A - 1) * Right;
       Tmp1 = 0x3f3f3f3f3f3f3f3f, Change(N, 1, m);
-      // printf("Change To %lld & %lld\n", Tmp1, Tmp2);
     }
   }
   Print(N, 1, m);
   printf("%lld\n", Ans);
-  // system("pause");
   return 0;
 }
-/*
-4 2 3
-1 3 5
-2 1 2 4 8
-2 3 3 7 9
-3 1 2 5 6 9 10
-
-3 2 3
-1 3 5
-2 1 2 4 8
-2 3 3 7 9
-*/
