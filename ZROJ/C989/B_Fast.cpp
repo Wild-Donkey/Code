@@ -45,7 +45,7 @@ signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
   //  t = RD();
-  //  fo r (unsigned T(1); T <= t; ++T){
+  //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD(), m = n >> 1;
   for (register unsigned i(1); i <= n; ++i)
