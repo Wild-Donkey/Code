@@ -29,28 +29,49 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned a[10005], m, n;
-unsigned A, B, C, D, t;
-unsigned Cnt(0), Ans(0), Tmp(0);
+unsigned B, W, n;
+unsigned A, C, D, t;
+unsigned Cnt(0), Ans(0);
 struct Node;
 struct Edge {
   Node* To;
-  unsigned Val;
+  unsigned long long Val;
 };
 struct Node {
   vector<Edge> E;
-  unsigned f;
+  Node* Fa;
+  unsigned long long f[2005];
+  unsigned Size;
 }N[2005];
+inline void DFS(Node* x) {
+  x->Size = 1;
+  for (auto i:x->E) if(x->Fa != i.To) {
+    i.To->Fa = x, DFS(i.To);
+    for (unsigned j(x->Size + i.To->Size); ~j; --j) {
+      unsigned long long Tmpg(0), Tmpf(0);
+      for (unsigned k(min(j, i.To->Size)); (k + x->Size >= j) && (~k); --k) {
+        unsigned long long WB(i.Val * (((B - k) * k) + ((W - i.To->Size + k) * (i.To->Size - k))));
+        if(Tmpf < x->f[j - k] + i.To->f[k] + WB) Tmpf = x->f[j - k] + i.To->f[k] + WB;
+      }
+      x->f[j] = Tmpf;
+    }
+    x->Size += i.To->Size;
+  }
+}
 signed main() {
 //  freopen(".in", "r", stdin);
 //  freopen(".out", "w", stdout);
 //  t = RD();
 //  for (unsigned T(1); T <= t; ++T){
 //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) {
-    a[i] = RD();
+  n = RD(), W = n - (B = RD());
+  for (unsigned i(1); i < n; ++i) {
+    A = RD(), D = RD(), C = RD();
+    N[A].E.push_back((Edge){N + D, C});
+    N[D].E.push_back((Edge){N + A, C});
   }
+  DFS(N + 1);
+  printf("%llu\n", N[1].f[B]);
 //  }
   return Wild_Donkey;
 }

@@ -31,7 +31,7 @@ inline int RDsg() {
 }
 const unsigned long long Mod(998244353);
 unsigned long long Ans[100005];
-unsigned long long Heal[100005], Infe[100005], Clen[100005];
+unsigned long long Heal[200005], Infe[200005];
 unsigned m, n, Hd(0), Tl(0);
 unsigned A, B, C, D, t;
 unsigned Cnt(0), Tmp(0);
@@ -40,7 +40,7 @@ struct Node {
   Node* Fa;
   unsigned long long f, P, Q, IP, IQ, If;
   unsigned IdG;
-}N[100005], * Q[100005];
+}N[100005], * Q[200005];
 unsigned long long Pow(unsigned long long x, unsigned long long y) {
   unsigned long long TmP(1); 
   while (y) {
@@ -79,20 +79,20 @@ signed main() {
   for (unsigned i(1); i <= n; ++i) { N[i].If = Mod + 1 - N[i].f; if(N[i].If >= Mod) N[i].If -= Mod;}
   for (unsigned i(1); i <= n; ++i) if(N[i].IdG) {
     Node* Beg(N + i), * Cur(Beg);
-    unsigned long long Pi(1);
     Tl = 0;
     do Q[++Tl] = Cur, Cur->IdG = 0, Cur = Cur->Fa; while (Cur != Beg);
     for (unsigned k(1); k <= Tl; ++k) {
       Q[k]->f = 1;
       for (auto j:Q[k]->Son) Q[k]->f = (Q[k]->f * (Mod + 1 - (j->f * j->Q % Mod))) % Mod;
-      Q[k]->f = (Q[k]->P + (Q[k]->IP * (Q[k]->If))) % Mod;
+      Q[k]->f = (Q[k]->P + (Q[k]->IP * (Mod + 1 - Q[k]->f))) % Mod;
       Q[k]->If = Mod + 1 - Q[k]->f; if(Q[k]->If >= Mod) Q[k]->If -= Mod;
     }
     for (unsigned j(1); j <= Tl; ++j) Q[Tl + j] = Q[j];
     Hd = Tl << 1;
-//    for (unsigned j(1); j <= Hd; ++j) printf("Tl %u Q %u = %u\n", Tl, j, Q[j] - N);
-    Heal[0] = Infe[0] = 1;
-    for (unsigned j(1); j <= Hd; ++j) Heal[j] = Heal[j - 1] * (Q[j]->If) % Mod;
+//    for (unsigned j(1); j <= Tl; ++j) printf("%u %u;", j, Q[j] - N);
+//    putchar(0x0A);
+    Heal[0] = Infe[0] = 1, Q[Hd + 1] = Q[1];
+    for (unsigned j(1); j <= Hd; ++j) Heal[j] = Heal[j - 1] * Q[j]->If % Mod;
     for (unsigned j(1); j <= Hd; ++j) Infe[j] = Infe[j - 1] * Q[j]->Q % Mod;
     unsigned long long SumNH(0), SumBl(0);
     for (unsigned Len(1); Len < Tl; ++Len) {
@@ -106,15 +106,13 @@ signed main() {
       unsigned long long TmCrNH(Mod + 1 - (Heal[j] * Pow(Heal[j - Tl], Mod - 2) % Mod));
       unsigned long long TmCrBl(Infe[j - 1] * Pow(Infe[j - Tl], Mod - 2) % Mod);
       Ans[Q[j] - N] = (Ans[Q[j] - N] + TmCrNH * TmCrBl) % Mod;
-      TmCrNH = (Heal[j] * Pow(Heal[j - Tl + 1], Mod - 2) % Mod);
-      TmCrBl = ((Infe[j - 1] * Pow(Infe[j - Tl + 1], Mod - 2) % Mod) * (Q[j - Tl + 1]->IQ)) % Mod;
+      TmCrNH = Heal[j] * Pow(Heal[j - Tl + 1], Mod - 2) % Mod;
+      TmCrBl = (Infe[j - 1] * Pow(Infe[j - Tl + 1], Mod - 2) % Mod) * (Q[j - Tl + 1]->IQ) % Mod;
       SumBl = SumBl + Mod - TmCrBl;
-      SumBl = SumBl * Q[j + 1]->Q;
-      SumBl = SumBl + Mod + 1 - Q[j]->Q;
-      if(SumBl >= Mod) SumBl -= Mod;
-      SumNH = SumNH + Mod - (TmCrBl * TmCrNH) % Mod;
+      SumBl = (SumBl * Q[j]->Q + Q[j]->IQ) % Mod;
+      SumNH = SumNH + Mod - (TmCrBl * TmCrNH % Mod);
       SumNH = (SumNH * Q[j]->Q % Mod) * (Q[j + 1]->If) % Mod;
-      SumNH = (SumNH + (Q[j + 1]->IQ) * (Q[j + 1]->If)) % Mod;
+      SumNH = (SumNH + (Q[j]->IQ) * (Q[j + 1]->If)) % Mod;
     }
   }
   for (unsigned i(1); i <= n; ++i) printf("%llu ", Ans[i]);
