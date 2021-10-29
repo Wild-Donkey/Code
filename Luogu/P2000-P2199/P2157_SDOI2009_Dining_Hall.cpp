@@ -43,13 +43,12 @@ signed main() {
 //  freopen(".in", "r", stdin);
 //  freopen(".out", "w", stdout);
   t = RD();
-  Anger[0] = 0x3f3f3f3f; 
-  Cant[0] = -1;
+  Anger[0] = 0x3f3f3f3f, Cant[0] = -1;
   for (unsigned i(1); i <= 7; ++i) Cant[i] = Cant[i - 1] << 1;
   for (unsigned T(1); T <= t; ++T){
     Clr();
     for (unsigned i(1); i <= n; ++i) Like[i] = RD(), Anger[i] = RD();
-    f[2][0][0][1] = 0, Anger[n + 1] = 0;
+    f[2][0][0][1] = 0, Anger[n + 1] = 7;
     for (unsigned i(2), Now(0); i <= 8; ++i) {
       Now |= Cant[Anger[i - 1]] << (i - 1);
       if(Now & (1 << (i - 1))) break;
@@ -66,10 +65,11 @@ signed main() {
         Now = i - 1;
         for (unsigned k(0); k < 7; ++k) if(j & (1 << k)) Now = i + k + 1;
         for (unsigned k(1); k <= 7; ++k) {
-          if(i < k) break;
+          if(i <= k) break;
           if(Anger[i - k] < Now - i + k) continue;
           unsigned Des(j << k);
           Des |= (1 << (k - 1)) - 1;
+//          printf("Pre %u Des %u\n", j, Des);
           for (unsigned l(1); l <= 7; ++l) {
             if(i - k < l) break;
             f[i][j][0][k] = min(f[i][j][0][k], f[i - k][Des][0][l] + (Like[i - k - l] ^ Like[i - k]));
@@ -81,16 +81,16 @@ signed main() {
 //          printf("f[%u, %u, %u, %u] = %u\n", i, j, 0, k, f[i][j][0][k]);
         }
         for (unsigned k(1); k <= 7; ++k) {
-          if(!((1 << k) & j)) continue;
+          if(!((1 << (k - 1)) & j)) continue;
           if(Anger[i + k] < Now - i - k) continue;
           unsigned Des(j ^ (1 << (k - 1)));
           for (unsigned l(1); l <= 7; ++l) {
             if(i < l) break;
-            f[i][j][1][k] = min(f[i][j][1][k], f[i][Des][0][l] + Like[i - l] ^ Like[i + k]);
+            f[i][j][1][k] = min(f[i][j][1][k], f[i][Des][0][l] + (Like[i - l] ^ Like[i + k]));
           }
           for (unsigned l(1); l <= 7; ++l) {
             if(!((1 << (l - 1)) & Des)) continue;
-            f[i][j][1][k] = min(f[i][j][1][k], f[i][Des][1][l] + Like[i + l] ^ Like[i + k]);
+            f[i][j][1][k] = min(f[i][j][1][k], f[i][Des][1][l] + (Like[i + l] ^ Like[i + k]));
           }
 //          printf("f[%u, %u, %u, %u] = %u\n", i, j, 1, k, f[i][j][1][k]);
         }
@@ -101,4 +101,37 @@ signed main() {
   }
   return Wild_Donkey;
 }
+/*
+5
+5
+3 0
+8 0
+2 0
+4 0
+5 0
+5
+3 1
+8 1
+2 1
+4 1
+5 1
+5
+3 7
+8 7
+2 7
+4 7
+5 7
+5
+3 4
+8 4
+2 4
+4 4
+5 4
+5
+3 3
+8 3
+2 3
+4 3
+5 3
 
+*/
