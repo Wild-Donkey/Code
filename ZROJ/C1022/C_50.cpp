@@ -29,13 +29,13 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-__int128 Ans(0), Cced[100005], f[100005], Mu[100005];
-__int128 Sum2[100005], Sum[100005], Cnt[100005];
-long long a[100005], m, n;
-long long CntP(0), Prime[20005];
+unsigned long long Ans(0), Cced[100005];
+unsigned long long Sum2[100005], Sum[100005], Cnt[100005];
+unsigned a[100005], m, n;
+int f[100005], Mu[100005];
+unsigned CntP(0), Prime[20005];
 unsigned A, B, C, D, t;
 unsigned Tmp(0);
-char Stack[105], Len(0);
 bitset<100005> Isnt;
 inline void Pre () {
   Mu[1] = 1;
@@ -56,18 +56,13 @@ inline void Pre () {
 //    printf("f%u = %d\n", i, f[i]);
   }
 }
-inline void Calc(long long x, long long Pos) {
+inline void Calc(unsigned x, unsigned Pos) {
 //  printf("Calc %u %u\n", x, Pos);
-  Cced[x] += Cnt[x] * (((n * n + n) >> 1) + Pos * (Pos - 1 - n)) + Sum2[x] - Pos * Sum[x];
+  Cced[x] += Cnt[x] * (((n * n + n) >> 1) + Pos * Pos - Pos * (n + 1)) + Sum2[x] - Pos * Sum[x];
   ++Cnt[x], Sum[x] += Pos, Sum2[x] += Pos * Pos;
 }
 inline void Prt(){
-  while (Ans) {
-    Stack[++Len] = Ans % 10;
-    Ans /= 10;
-  }
-  for (unsigned i(Len); i; --i) putchar(Stack[i] + '0');
-  putchar(0x0A);
+  printf("%llu\n", Ans);
 }
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -79,8 +74,8 @@ signed main() {
 //  for (unsigned i(1); i <= 100; ++i) printf("%d ", Mu[i]);
   n = RD();
   for (unsigned i(1); i <= n; ++i) a[i] = RD();
-  for (long long i(1); i <= n; ++i) {
-    for (long long j(sqrt(a[i])); j; --j) if(!(a[i] % j)) {
+  for (unsigned i(1); i <= n; ++i) {
+    for (unsigned j(sqrt(a[i])); j; --j) if(!(a[i] % j)) {
       Calc(j, i);
       if(j ^ (a[i] / j)) Calc(a[i] / j, i);
     }

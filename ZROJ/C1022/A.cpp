@@ -99,8 +99,8 @@ signed main() {
   sort(b + 1, b + n + 1), b[0] = unique(b + 1, b + n + 1) - b;
   sort(c + 1, c + n + 1), c[0] = unique(c + 1, c + n + 1) - c;
   for (unsigned i(1); i <= n; ++i) {
-    Sumx += a[i].RV;
-    Sumy += a[i].RH;
+    Sumx += a[i].RV;if(Sumx >= Mod) Sumx -= Mod;
+    Sumy += a[i].RH;if(Sumy >= Mod) Sumy -= Mod;
     Sumqx = (Sumqx + (unsigned long long)a[i].RV * a[i].RV) % Mod;
     Sumqy = (Sumqy + (unsigned long long)a[i].RH * a[i].RH) % Mod;
     a[i].Ve = lower_bound(b + 1, b + b[0], a[i].RV) - b;
@@ -122,9 +122,12 @@ signed main() {
 //    printf("Ans %u Pre %llu\n", a[i].Num, (*An) % Mod);
     A = 1, B = a[i].Ho, QN = Qx = Qy = Qxy = 0, Root[i]->Qry(1, c[0]);
     *An = ((*An) + (QN * Nx % Mod) * Ny) % Mod;
-    *An = ((*An) + Mod + Mod + Qxy - (Qy * Nx % Mod) - (Qx * Ny % Mod)) % Mod;
+    *An = ((*An) + (Mod << 1) + Qxy - (Qy * Nx % Mod) - (Qx * Ny % Mod)) % Mod;
     TN = QN, Tx = Qx, Ty = Qy, Txy = Qxy, QN = Qx = Qy = Qxy = 0, Root[n]->Qry(1, c[0]);
-    QN -= TN, Qx -= Tx, Qy -= Ty, Qxy -= Txy;
+    QN -= TN, Qx = Qx + Mod - Tx, Qy = Qy + Mod - Ty, Qxy = Qxy + Mod - Txy;
+    if(Qx >= Mod) Qx -= Mod;
+    if(Qy >= Mod) Qy -= Mod;
+    if(Qxy >= Mod) Qxy -= Mod;
     *An = (*An) + Mod - ((QN * Nx % Mod) * Ny % Mod);
     *An = ((*An) + Mod + (Qy * Nx) + (Qx * Ny) - Qxy) % Mod;
 //    printf("Ans %u Pre %llu\n", a[i].Num, (*An) % Mod);
@@ -134,9 +137,12 @@ signed main() {
 //    printf("Tn %llu Tx %llu Ty %llu Txy %llu\n", QN, Qx, Qy, Qxy);
     TN = QN, Tx = Qx, Ty = Qy, Txy = Qxy, QN = Qx = Qy = Qxy = 0, Root[n]->Qry(1, c[0]);
 //    printf("Qn %llu Qx %llu Qy %llu Qxy %llu\n", QN, Qx, Qy, Qxy);
-    QN -= TN, Qx -= Tx, Qy -= Ty, Qxy -= Txy;
+    QN -= TN, Qx = Qx + Mod - Tx, Qy = Qy + Mod - Ty, Qxy = Qxy + Mod - Txy;
+    if(Qx >= Mod) Qx -= Mod;
+    if(Qy >= Mod) Qy -= Mod;
+    if(Qxy >= Mod) Qxy -= Mod;
     *An = ((*An) + (QN * Nx % Mod) * Ny) % Mod;
-    *An = ((*An) + Mod + Mod + Qxy - (Qy * Nx % Mod) - (Qx * Ny % Mod)) % Mod;
+    *An = ((*An) + (Mod << 1) + Qxy - (Qy * Nx % Mod) - (Qx * Ny % Mod)) % Mod;
     *An = (*An) << 1; if(*An >= Mod) (*An) -= Mod;
   }
   for (unsigned i(1); i <= n; ++i) printf("%llu\n", Ans[i]); 

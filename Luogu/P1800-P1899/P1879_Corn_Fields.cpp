@@ -34,29 +34,39 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned a[15], f[15][15][4500], m, n, n2, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
-inline void Clr() {}
+const unsigned long long Mod(100000000);
+unsigned long long f[13][12][4100], Ans;
+unsigned a[15], m, n, n2, Cnt(0), A, B, C, D, t, Tmp(0);
 int main() {
 //  freopen(".in", "r", stdin);
 //  freopen(".out", "w", stdout);
 //  t = RD();
 //  for (register unsigned T(1); T <= t; ++T){
 //  Clr();
-  n = RD(), m = RD(), n2 = (1 << n); 
+  n = RD(), m = RD(), n2 = (1 << m); 
   for (register unsigned i(1); i <= n; ++i) {
     for (register unsigned j(1); j <= m; ++j) {
       a[i] <<= 1, a[i] += RD();
     }
   }
+  f[0][m - 1][0] = 1;
   for (register unsigned i(1); i <= n; ++i) {
-    for (register unsigned j(0); j < m; ++j) {
+    for (register unsigned k(0); k < n2; ++k) {
+      if(!(k & 1)) {f[i][0][k] = f[i - 1][m - 1][k ^ 1] + f[i - 1][m - 1][k]; if(f[i][0][k] >= Mod) f[i][0][k] -= Mod;}
+      if(a[i] & k & 1) f[i][0][k] = f[i - 1][m - 1][k ^ 1];
+//        printf("f[%u][%u][%u] = %llu\n", i, 0, k, f[i][0][k]);
+    }
+    for (register unsigned j(1); j < m; ++j) {
       for (register unsigned k(0); k < n2; ++k) {
-        if((a[i] & (1 << j)) && (k & (1 << j))) {
-          
-        }
+        if((k & (1 << j)) && (k & (1 << (j - 1)))) continue;
+        if(a[i] & k & (1 << j)) f[i][j][k] = f[i][j - 1][k ^ (1 << j)];
+        if(!(k & (1 << j))) {f[i][j][k] = f[i][j - 1][k ^ (1 << j)] + f[i][j - 1][k]; if(f[i][j][k] >= Mod) f[i][j][k] -= Mod;}
+//        printf("f[%u][%u][%u] = %llu\n", i, j, k, f[i][j][k]);
       }
     }
   }
+  for (unsigned i(0); i < n2; ++i) Ans += f[n][m - 1][i];
+  printf("%llu\n", Ans % Mod);
 //  }
   return Wild_Donkey;
 }

@@ -31,8 +31,7 @@ inline int RDsg() {
 }
 long long Ans(0), C, a[2000005];
 unsigned m, n;
-unsigned A, B, D, t;
-unsigned Cnt(0), Tmp(0);
+unsigned A, B, D;
 struct Node {
   Node* LS, * RS;
   long long Mx, Val, Tag;
