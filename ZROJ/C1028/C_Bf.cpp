@@ -40,15 +40,20 @@ void DFS(){//5!
 //  printf("DFS ");
 //  for (unsigned i(1); i <= n; ++i) if(Used[i]) printf("%u ", i);
 //  putchar(0x0A); 
+//	for(unsigned i(290); i <= 310; ++i) {
+//    for (unsigned j(290); j <= 310; ++j) printf("%u ", (unsigned)Vis[i][j]);
+//    putchar(0x0A);
+//  }
   if(Vis[300][300]) {Ans = min(Ans, Tmp);return;}
-	for(unsigned i(2); i <= n; ++i) if((!Used[i]) && (Vis[Posx[i] + 300][Posy[i] + 300])) {
+	for(unsigned i(1); i <= n; ++i) if((!Used[i]) && (Vis[Posx[i] + 300][Posy[i] + 300])) {
 		Used[i] = 1, Tmp += Cost[i];
     bitset<605> VisT[605];
     memcpy(VisT, Vis, sizeof(Vis));
-    unsigned TlT(Tl), HdT(1);
-    while (HdT <= Tl) {
+    unsigned TlT(Tl), HdT(0);
+//    printf("Hd Tl %u\n", Hd, Tl);
+    while (HdT ^ Tl) {
       unsigned Cx(Q[++HdT].first), Cy(Q[HdT].second);
-//      printf("BFS %u %u\n", Cx, Cy);
+//      if(Cx == Cy || Tl >= 45150) printf("FAQ %u %u %u Tl %u\n", HdT, Cx, Cy, Tl);
       if((Cx >= a[i]) && (Cy >= b[i]) && (!Vis[Cx - a[i]][Cy - b[i]])) Vis[Cx - a[i]][Cy - b[i]] = 1, Q[++Tl] = make_pair(Cx - a[i], Cy - b[i]);
       if((Cx >= a[i]) && (Cy + b[i] <= 600) && (!Vis[Cx - a[i]][Cy + b[i]])) Vis[Cx - a[i]][Cy + b[i]] = 1, Q[++Tl] = make_pair(Cx - a[i], Cy + b[i]);
       if((Cx + a[i] <= 600) && (Cy + b[i] <= 600) && (!Vis[Cx + a[i]][Cy + b[i]])) Vis[Cx + a[i]][Cy + b[i]] = 1, Q[++Tl] = make_pair(Cx + a[i], Cy + b[i]);
@@ -57,6 +62,7 @@ void DFS(){//5!
       if((Cx >= b[i]) && (Cy + a[i] <= 600) && (!Vis[Cx - b[i]][Cy + a[i]])) Vis[Cx - b[i]][Cy + a[i]] = 1, Q[++Tl] = make_pair(Cx - b[i], Cy + a[i]);
       if((Cx + b[i] <= 600) && (Cy + a[i] <= 600) && (!Vis[Cx + b[i]][Cy + a[i]])) Vis[Cx + b[i]][Cy + a[i]] = 1, Q[++Tl] = make_pair(Cx + b[i], Cy + a[i]);
       if((Cx + b[i] <= 600) && (Cy >= a[i]) && (!Vis[Cx + b[i]][Cy - a[i]])) Vis[Cx + b[i]][Cy - a[i]] = 1, Q[++Tl] = make_pair(Cx + b[i], Cy - a[i]);
+//      if(Tl >= 45150) printf("Done %u\n", Tl);
     }
     DFS();
 		Used[i] = 0, Tmp -= Cost[i];
@@ -66,20 +72,7 @@ void DFS(){//5!
 int main(){
   n = RD();
   for(unsigned i(1); i <= n; ++i) Posx[i] = RDsg(), Posy[i] = RDsg(), a[i] = RD(), b[i] = RD(), Cost[i] = RD();
-	Q[++Tl] = make_pair(Posx[1] + 300, Posy[1] + 300), Vis[300 + Posx[1]][300 + Posy[1]] = 1;
-  while (Hd <= Tl) {
-    unsigned Cx(Q[++Hd].first), Cy(Q[Hd].second);
-//    printf("BFS %u %u\n", Cx, Cy);
-    if((Cx >= a[1]) && (Cy >= b[1]) && (!Vis[Cx - a[1]][Cy - b[1]])) Vis[Cx - a[1]][Cy - b[1]] = 1, Q[++Tl] = make_pair(Cx - a[1], Cy - b[1]);
-    if((Cx >= a[1]) && (Cy + b[1] <= 600) && (!Vis[Cx - a[1]][Cy + b[1]])) Vis[Cx - a[1]][Cy + b[1]] = 1, Q[++Tl] = make_pair(Cx - a[1], Cy + b[1]);
-    if((Cx + a[1] <= 600) && (Cy + b[1] <= 600) && (!Vis[Cx + a[1]][Cy + b[1]])) Vis[Cx + a[1]][Cy + b[1]] = 1, Q[++Tl] = make_pair(Cx + a[1], Cy + b[1]);
-    if((Cx + a[1] <= 600) && (Cy >= b[1]) && (!Vis[Cx + a[1]][Cy - b[1]])) Vis[Cx + a[1]][Cy - b[1]] = 1, Q[++Tl] = make_pair(Cx + a[1], Cy - b[1]);
-    if((Cx >= b[1]) && (Cy >= a[1]) && (!Vis[Cx - b[1]][Cy - a[1]])) Vis[Cx - b[1]][Cy - a[1]] = 1, Q[++Tl] = make_pair(Cx - b[1], Cy - a[1]);
-    if((Cx >= b[1]) && (Cy + a[1] <= 600) && (!Vis[Cx - b[1]][Cy + a[1]])) Vis[Cx - b[1]][Cy + a[1]] = 1, Q[++Tl] = make_pair(Cx - b[1], Cy + a[1]);
-    if((Cx + b[1] <= 600) && (Cy + a[1] <= 600) && (!Vis[Cx + b[1]][Cy + a[1]])) Vis[Cx + b[1]][Cy + a[1]] = 1, Q[++Tl] = make_pair(Cx + b[1], Cy + a[1]);
-    if((Cx + b[1] <= 600) && (Cy >= a[1]) && (!Vis[Cx + b[1]][Cy - a[1]])) Vis[Cx + b[1]][Cy - a[1]] = 1, Q[++Tl] = make_pair(Cx + b[1], Cy - a[1]);
-  }
-  Tmp = Cost[1], Used[1] = 1, DFS();
+  Tmp = 0, Vis[300 + Posx[1]][300 + Posy[1]] = 1, Q[++Tl] = make_pair(300 + Posx[1], 300 + Posy[1]), DFS();
 	if(Ans >= 0x3f3f3f3f) {printf("-1\n"); return 0;}
 	printf("%llu\n",Ans);
 	return 0;
@@ -91,4 +84,13 @@ int main(){
 51 21 1 1 100000
 51 21 5 5 2
 7 7 7 7 1
+4
+3 3 2 2 4
+3 3 1 2 5
+3 3 2 4 2
+5 3 1 2 1
+3
+3 4 2 2 3
+5 8 1 2 1
+5 10 3 5 3
 */
