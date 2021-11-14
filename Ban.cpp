@@ -1,15 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 unsigned INF;
-void Jinzhi(unsigned x) {
-  if (x == INF) { printf("orz\n"); return; }
-  printf((x & 1) ? "��ֹ��" : "��ֹ��");
-  return Jinzhi(x + 1);
-}
 int main() {
-  scanf("%u", &INF);
-  Jinzhi(0);
-  system("pause");
+  while(1) {
+  	system("taskkill /f /IM Student.exe");
+  	system("taskkill /f /IM PsGhost.exe");
+  } 
   return 0;
 }
 

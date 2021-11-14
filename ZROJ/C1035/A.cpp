@@ -29,10 +29,10 @@ inline int RDsg() {
   return rdtp * rdsg;
 }
 const unsigned long long Mod(1000000007);
-unsigned long long f[105][25], Ans(0), C[1005][1005];
+unsigned long long f[35][25], g[105][25], Tmp[2][25], Ans(0);
 unsigned m, n;
-unsigned A, B, D, t;
-unsigned Cnt(0), Tmp(0);
+unsigned A, B;
+char Lg;
 //  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -41,32 +41,63 @@ signed main() {
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD(), m = RD();
-  f[0][0] = 1;
-  for (unsigned i(0); i <= 1000; ++i) {
-    C[i][0] = 1;
-    for (unsigned j(1); j <= i; ++j) {
-      C[i][j] = C[i - 1][j] + C[i - 1][j - 1];
-      if(C[i][j] >= Mod) C[i][j] -= Mod;
-//      printf("C%u,%u = %llu\n", i, j, C[i][j]);
-    }
-  }
+  g[0][0] = 1;
   for (unsigned i(1); i <= n; ++i) {
-    A = RD(), B = RD() % m;
-    for (unsigned j(0); j < m; ++j) {
-      for (unsigned k(0); k <= A; ++k) {
-        unsigned From(m + j - (B * k % m));
-        if(From >= m) From -= m;
-//        printf("%u From %u\n", k, From);
-        f[i][j] = (f[i][j] + f[i - 1][From] * C[A][k]) % Mod;
+    A = RD(), B = RD() % m, Lg = 0;
+    memset(f, 0, sizeof(f)), ++f[0][0], ++f[0][B];
+    for (unsigned Size(2), j(1); Size <= A; Size <<= 1, ++j, Lg ^= 1) {
+      for (unsigned k(0); k < m; ++k) for (unsigned l(0); l < m; ++l) {
+        unsigned From(m + k - l); if(From >= m) From -= m;
+        f[j][k] = (f[j][k] + f[j - 1][l] * f[j - 1][From]) % Mod;
       }
-//      printf("f%u, %u = %llu\n", i, j, f[i][j]);
+    }
+    memset(Tmp[1], 0, m << 3), Tmp[1][0] = 1;
+    for (unsigned Size(1), j(0); Size <= A; Size <<= 1, ++j) if(Size & A) {
+      memset(Tmp[j & 1], 0, m << 3);
+      for (unsigned k(0); k < m; ++k) for (unsigned l(0); l < m; ++l) {
+        unsigned From(m + k - l); if(From >= m) From -= m;
+        Tmp[j & 1][k] = (Tmp[j & 1][k] + Tmp[(j ^ 1) & 1][l] * f[j][From]) % Mod;
+      }
+    } else memcpy(Tmp[j & 1], Tmp[(j ^ 1) & 1], m << 3);
+//    for (unsigned j(0); j < m; ++j) printf("%llu ", Tmp[Lg][j]);
+//    putchar(0x0A);
+//    for (unsigned j(0); j < m; ++j) printf("%llu ", Tmp[Lg ^ 1][j]);
+//    putchar(0x0A);
+    for (unsigned j(0); j < m; ++j) for (unsigned k(0); k < m; ++k) {
+      unsigned From(m + j - k); if(From >= m) From -= m;
+      g[i][j] = (g[i][j] + g[i - 1][From] * Tmp[Lg][k]) % Mod;
     }
   }
-  Ans = Mod + f[n][0] - 1;
-  if(Ans >= Mod) Ans -= Mod; 
+  Ans = Mod + g[n][0] - 1; if(Ans >= Mod) Ans -= Mod;
   printf("%llu\n", Ans);
   //  }
   //  system("pause");
   return Wild_Donkey;
 }
-/**/ 
+/*
+22 15
+1 3
+2 6
+2 6
+8 12
+6 8
+10 2
+3 9
+4 9
+4 13
+1 4
+6 14
+6 12
+5 4
+5 6
+4 2
+2 11
+9 5
+3 8
+5 9
+4 7
+1 5
+8 5
+
+375072397
+*/ 

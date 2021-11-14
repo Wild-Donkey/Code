@@ -3,13 +3,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <set>
 #include <ctime>
+#include <bitset>
 #include <iostream>
 #include <map>
 #include <queue>
 #include <string>
+#include <set>
 #include <vector>
 #define Wild_Donkey 0
+#define INFi 0x3f3f3f3f3f3f3f3f
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -28,25 +32,22 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned a[500005], m, n;
-unsigned A, B, C, D, E, t, Now;
+map<pair<unsigned, unsigned>, unsigned> List;
+unsigned m, n, Now;
+unsigned A, B, C, D, t;
 unsigned Cnt(0), Ans(0), Tmp(0);
-//  inline void Clr() {}
+char Flg(0);
 signed main() {
-  //  freopen(".in", "r", stdin);
-  //  freopen(".out", "w", stdout);
-  t = RD();
-  for (unsigned T(1); T <= t; ++T){
-    n = RD(), A = RD(), B = RD(), C = RD(), D = RD(), E = RD();
-    for (unsigned i(1); i <= n; ++i) {
-      a[i] = RD();
-      if(Now & 1) --A;
-      a[i] >>= 1;
-      
-    }
-    printf("YES\n");
-  }
-  //  system("pause");
+  do {
+    printf("Judge %u\n", ++Cnt);
+    system("A_Make.exe");
+    system("A.exe");
+    system("A_XMZ.exe");
+  }while (!system("fc A.ans A.out"));
   return Wild_Donkey;
 }
-
+/*
+2
+0 5 10
+6 7 10
+*/

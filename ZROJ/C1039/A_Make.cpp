@@ -4,12 +4,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <bitset>
 #include <iostream>
 #include <map>
 #include <queue>
 #include <string>
 #include <vector>
 #define Wild_Donkey 0
+#define INFi 0x3f3f3f3f3f3f3f3f
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -28,25 +30,45 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned a[500005], m, n;
-unsigned A, B, C, D, E, t, Now;
-unsigned Cnt(0), Ans(0), Tmp(0);
+unsigned long long Ans(0);
+unsigned V[105], m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Tmp(0);
+char IO[105];
+bitset<105> a[105];
+struct Gro {
+  bitset<105> Set;
+  unsigned long long Val;
+  unsigned Last;
+  inline const char operator <(const Gro& x) const {return Val < x.Val;}
+}Epsi, Cur;
+priority_queue<Gro> Q;
 //  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
-  //  freopen(".out", "w", stdout);
-  t = RD();
-  for (unsigned T(1); T <= t; ++T){
-    n = RD(), A = RD(), B = RD(), C = RD(), D = RD(), E = RD();
-    for (unsigned i(1); i <= n; ++i) {
-      a[i] = RD();
-      if(Now & 1) --A;
-      a[i] >>= 1;
-      
-    }
-    printf("YES\n");
+  freopen("A.in", "w", stdout);
+  //  t = RD();
+  //  for (unsigned T(1); T <= t; ++T){
+  //  Clr();
+  n = 100, m = 1000000;
+  printf("%u %u\n", n, m);
+  for (unsigned i(1); i <= n; ++i) printf("%u ", rand());
+  putchar(0x0A);
+  for (unsigned i(1); i <= n; ++i) {
+    for (unsigned j(1); j < i; ++j) putchar('1');
+    putchar('0');
+    for (unsigned j(i + 1); j <= n; ++j) putchar('1');
+    putchar(0x0A);
   }
+  //  }
   //  system("pause");
   return Wild_Donkey;
 }
+/*
+2 5
+1 2
+01
+10
+100
 
+*/
