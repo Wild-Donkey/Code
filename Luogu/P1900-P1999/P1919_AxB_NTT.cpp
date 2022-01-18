@@ -85,11 +85,11 @@ signed main() {
   while (n < m) n <<= 1, ++Lgn;
   // for (unsigned i(0); i < n; ++i) printf("%u ", a[i]); putchar(0x0A);
   // for (unsigned i(0); i < n; ++i) printf("%u ", b[i]); putchar(0x0A);
-  Inv = 1, W = Pow(3, (Mod - 1) / n), DIF(a), DIF(b);
+  W = Pow(3, (Mod - 1) / n), DIF(a), DIF(b);
   // for (unsigned i(0); i < n; ++i) printf("%u ", a[i]); putchar(0x0A);
   // for (unsigned i(0); i < n; ++i) printf("%u ", b[i]); putchar(0x0A);
   for (unsigned i(0); i < n; ++i) a[i] = a[i] * b[i] % Mod;
-  Inv = 0, DIT(a), W = Pow(n, Mod - 2);
+  Inv = 1, DIT(a), W = Pow(n, Mod - 2);
   for (unsigned i(0); i < n; ++i) a[i] = a[i] * W % Mod;
   // for (unsigned i(0); i < n; ++i) printf("%u ", a[i]); putchar(0x0A);
   for (unsigned i(0); i < n; ++i) IO[i] = (a[i] + Tmp) % 10, Tmp = (a[i] + Tmp) / 10;
@@ -97,7 +97,7 @@ signed main() {
   while ((!IO[n - 1]) && (n > 1)) --n;
   for (unsigned i(n - 1); ~i; --i) putchar(IO[i] + '0'); putchar(0x0A);
   //  }
-  // system("pause");
+  system("pause");
   return Wild_Donkey;
 }
 /*
