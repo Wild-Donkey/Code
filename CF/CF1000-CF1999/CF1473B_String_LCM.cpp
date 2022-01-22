@@ -31,34 +31,35 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-long long f[50005], Mu[50005], Ans(0), Tmp(0);
-unsigned Prime[50005], Cnt(0), m, n;
-unsigned A, B, C, D, t;
-bitset<50005> No;
+unsigned m, n, M, N;
+unsigned C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+char a[25], b[25], A[405], B[405], Flg;
 inline void Clr() {
-  n = RD(), m = RD(), Ans = 0; if (m < n) swap(n, m);
+  memset(a, 0, sizeof(a));
+  memset(b, 0, sizeof(b));
+  memset(A, 0, sizeof(A));
+  memset(B, 0, sizeof(B));
+  scanf("%s%s", a + 1, b + 1);
+  n = strlen(a + 1);
+  m = strlen(b + 1);
+  N = 20 * n, M = 20 * m;
+  Flg = 0;
 }
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
-  for (unsigned i(1); i <= 50000; ++i) for (unsigned L(0), R(0), Div(0); R < i;)
-    L = R + 1, Div = i / L, R = i / Div, f[i] += (R - L + 1) * Div;// printf("%u [%u, %u]\n", i, L, R);
-  for (unsigned i(2); i <= 50000; ++i) {
-    if (!No[i]) Prime[++Cnt] = i, Mu[i] = -1;
-    for (unsigned j(1), Des(i* Prime[j]); (j <= Cnt) && (Des <= 50000); ++j, Des = i * Prime[j]) {
-      No[Des] = 1, Mu[Des] = Mu[i] * Mu[Prime[j]];
-      if (!(i % Prime[j])) { Mu[Des] = 0; break; }
-    }
-  }
-  t = RD(), Mu[1] = 1;
-  for (unsigned i(2); i <= 50000; ++i) Mu[i] += Mu[i - 1];
-  // for (unsigned i(1); i <= 100; ++i) printf("%lld ", f[i]); putchar('\n');
-  // for (unsigned i(1); i <= 100; ++i) printf("%lld ", Mu[i]); putchar('\n');
+  t = RD();
   for (unsigned T(1); T <= t; ++T) {
     Clr();
-    for (unsigned L(0), R(0); R < n;)
-      L = R + 1, A = n / L, B = m / L, R = min(n / A, m / B), Ans += (Mu[R] - Mu[L - 1]) * f[A] * f[B];
-    printf("%lld\n", Ans);
+    for (unsigned i(0); i < 20; ++i) memcpy(A + (n * i) + 1, a + 1, n);
+    for (unsigned i(0); i < 20; ++i) memcpy(B + (m * i) + 1, b + 1, m);
+    for (unsigned i(1); i <= N; ++i) {
+      if (A[i] ^ B[i]) { Flg = 1; break; }
+      if ((!(i % n)) && (!(i % m))) { for (unsigned j(1); j <= i; ++j) putchar(A[j]); putchar(0x0A); break; }
+      if ((i == N) || (i == M)) { Flg = 1; break; }
+    }
+    if (Flg) printf("-1\n");
   }
   // system("pause");
   return Wild_Donkey;
