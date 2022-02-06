@@ -64,8 +64,10 @@ int main() {
 }
 //sect 51893847 
 //ais 7048, 9105, 25125, 15706, 24001, 24019, 20447[1, 1253] And [1257, 1257]
-//Mozak 2890, 2838, 2496, 3102, 2933
-//ZidWrap 10641,  
+//QwQFic 50147[1,38], 56792, P[1, 2543]
+//Mozak 2890, 2838, 2496, 3102, 2933 
+//ZidWrap 10641
+
 //MatterTorz 2786(85, )
 // Luogu Online IDE with O2 0.062s
 // 2021 ASUS vivobook with r7-5800H at Quiet Mode with AC power c++11 -O2 1.243s
