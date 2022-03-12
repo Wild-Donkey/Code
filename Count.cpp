@@ -1,52 +1,8 @@
-#include <algorithm>
-#include <bitset>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
-#define Wild_Donkey 0
-using namespace std;
-inline unsigned RD() {
-  unsigned intmp(0);
-  char rdch(getchar());
-  while (rdch < '0' || rdch > '9') rdch = getchar();
-  while (rdch >= '0' && rdch <= '9')
-    intmp = (intmp << 3) + (intmp << 1) + rdch - '0', rdch = getchar();
-  return intmp;
-}
-inline int RDsg() {
-  int rdtp(0), rdsg(1);
-  char rdch(getchar());
-  while ((rdch < '0' || rdch > '9') && (rdch != '-')) rdch = getchar();
-  if (rdch == '-') rdsg = -1, rdch = getchar();
-  while (rdch >= '0' && rdch <= '9')
-    rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
-  return rdtp * rdsg;
-}
-unsigned long long f[10005], m(1), n;
+#include<bits/stdc++.h>
+unsigned m, n;
 unsigned A, B, C, D, t;
 unsigned Cnt(0), Ans(0), Tmp(0);
-//  inline void Clr() {}
 signed main() {
-  //  freopen(".in", "r", stdin);
-  //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
-  n = RD(), f[1] = 1;
-  for (unsigned i(2); i <= n; ++i) {
-    for (unsigned j(1); j < i; ++j) f[i] += f[max(j, i - j)];
-    f[i] <<= 1, m *= i, printf("%u %llu %llu\n", i, f[i], m);
-  }
-  //  }
-  //  system("pause");
-  return Wild_Donkey;
+  printf((Ans ? "tomato fish+%us\n" : "rainy day+%us\n"), 1);
+  return 0;
 }
