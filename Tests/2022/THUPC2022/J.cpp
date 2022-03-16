@@ -43,7 +43,7 @@ unsigned bx[200005], by[200005], Cn[10][10], m, n;
 unsigned A, B, C, D, t;
 unsigned CntT(0), CntH(0), CntU(0), CntP(0), CntC(0);
 unsigned Cntx(0), Cnty(0), STop(0), HC(0), VC(0), Ans(0), Tmp(0);
-char Vis[20];
+char Vis[20], Map[105][105];
 inline void DFS(unsigned x, char Type) {
   Stk[++STop] = Type ? V[x] : H[x];
   if(Type) {++A, Vis[x] = 1; for (unsigned i(1); i <= 7; ++i) if((Cn[x][i]) && (!Vis[i + 8])) DFS(i, 0);}
@@ -73,6 +73,7 @@ signed main() {
     else          Hor[a[i].Pos].push_back({a[i].L, a[i].R});
   }
   for (unsigned i(1); i < Cntx; ++i) if(Ver[i].size()) {
+    sort(Ver[i].begin(), Ver[i].end());
     unsigned Bg(Ver[i][0].first), To(Ver[i][0].second);
     for (auto j:Ver[i]) {
       if(j.first > To) {
@@ -85,8 +86,11 @@ signed main() {
     if(VC > 8) {printf("No\n"); return 0;}
   }
   for (unsigned i(1); i < Cnty; ++i) if(Hor[i].size()) {
+//    printf("%u : \n", i);
+    sort(Hor[i].begin(), Hor[i].end());
     unsigned Bg(Hor[i][0].first), To(Hor[i][0].second);
     for (auto j:Hor[i]) {
+//      printf("[%u, %u]\n", Bg, To);
       if(j.first > To) {
         H[++HC] = {Bg, To, i, 0};
         if(HC > 7) {printf("No\n"); return 0;}
@@ -96,6 +100,15 @@ signed main() {
     H[++HC] = {Bg, To, i, 0};
     if(HC > 7) {printf("No\n"); return 0;}
   }
+//  for (unsigned i(1); i <= VC; ++i) 
+//    for (unsigned j(V[i].L * 3); j <= V[i].R * 3; ++j) Map[j][V[i].Pos * 3] = 'a' + i - 1;
+//  for (unsigned i(1); i <= HC; ++i)
+//    for (unsigned j(H[i].L * 3); j <= H[i].R * 3; ++j) Map[H[i].Pos * 3][j] = 'a' + i - 1;
+//  for (unsigned i((Cnty - 1) * 3); i; --i) { 
+//    for (unsigned j(1); j <= (Cntx - 1) * 3; ++j) putchar(Map[i][j]); 
+//    putchar(0x0A);
+//  }
+//  printf("%u %u\n", VC, HC);
   if(VC < 8 || HC < 7) {printf("No\n"); return 0;}
   for (unsigned i(1); i <= 8; ++i) if(V[i].L == V[i].R) {printf("No\n"); return 0;}
   for (unsigned j(1); j <= 7; ++j) if(H[j].L == H[j].R) {printf("No\n"); return 0;}
