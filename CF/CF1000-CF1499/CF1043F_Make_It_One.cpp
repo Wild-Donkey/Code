@@ -32,9 +32,9 @@ inline int RDsg() {
   return rdtp * rdsg;
 }
 const unsigned long long Mod(998244353);
-bitset<4000005> No;
-unsigned a[4000005], b[4000005], Fac[4000005], Inv[4000005], Mu[4000005];
-unsigned Pri[1000005], CntP(0);
+bitset<300005> No;
+unsigned a[300005], b[300005], Fac[300005], Inv[300005], Mu[300005];
+unsigned Pri[50005], CntP(0);
 unsigned A, B(0), D, t, n;
 unsigned Cnt(0), Ans(0), Tmp(0);
 inline unsigned Gcd(unsigned x, unsigned y) {
@@ -62,26 +62,22 @@ signed main() {
   for (unsigned i(1); i <= n; ++i) B = Gcd(a[i] = RD(), B);
   if(B ^ 1) {printf("-1\n"); return 0;}
   for (unsigned i(1); i <= n; ++i) b[a[i]] = 1;
-  for (unsigned i(2); i <= 4000000; ++i) {
+  for (unsigned i(2); i <= 300000; ++i) {
     if(!No[i]) Mu[Pri[++CntP] = i] = 998244352;
-    for (unsigned j(1), k(2); (k * i <= 4000000) && (j <= CntP); k = Pri[++j]) {
+    for (unsigned j(1), k(2); (k * i <= 300000) && (j <= CntP); k = Pri[++j]) {
       No[k * i] = 1;
       if(!(i % k)) {Mu[k * i] = 0; break;}
       Mu[k * i] = (unsigned long long)Mu[k] * Mu[i] % Mod;
     }
   }
-//  printf("Mu:"); for (unsigned i(1); i <= 100; ++i) printf("%u ", Mu[i]); putchar(0x0A);
-  for (unsigned long long i(1); i <= 4000000; ++i) Fac[i] = Fac[i - 1] * i % Mod;
-  Inv[4000000] = Pow(Fac[4000000], 998244351);
-  for (unsigned long long i(4000000); i; --i) Inv[i - 1] = Inv[i] * i % Mod;
-//  printf("Inv:"); for (unsigned i(1); i <= 100; ++i) printf("%u ", Inv[i]); putchar(0x0A);
-  for (unsigned i(1); i <= 2000000; ++i)
-    for (unsigned j(4000000 / i); j > 1; --j) b[i] += b[i * j];
+  for (unsigned long long i(1); i <= 300000; ++i) Fac[i] = Fac[i - 1] * i % Mod;
+  Inv[300000] = Pow(Fac[300000], 998244351);
+  for (unsigned long long i(300000); i; --i) Inv[i - 1] = Inv[i] * i % Mod;
+  for (unsigned i(1); i <= 150000; ++i)
+    for (unsigned j(300000 / i); j > 1; --j) b[i] += b[i * j];
   for (unsigned i(1); i <= 6; ++i) {
     Ans = 0;
-    for (unsigned j(1); j <= 4000000; ++j) Ans = (Ans + (unsigned long long)Mu[j] * C(b[j], i)) % Mod;
-//    for (unsigned j(1); j <= 4000000; ++j) if(b[j]) printf("%u: %u %llu\n", j, b[j], C(b[j], i));
-//    printf("%u %u\n", i, Ans);
+    for (unsigned j(1); j <= 300000; ++j) Ans = (Ans + (unsigned long long)Mu[j] * C(b[j], i)) % Mod;
     if(Ans ^ 0) {printf("%u\n", i); return 0;}
   }
   printf("7\n");
