@@ -20,44 +20,12 @@ inline unsigned RD() {
 char Br[800005];
 vector<unsigned> List[400005];
 multiset<unsigned> Cur;
-unsigned Stack[400005], STop(0), Opp[800005], Pos[400005], Val[400005];
-unsigned nn, n, m, Cnt(0), A, B, Mx;
+unsigned Stack[400005], Cnt(0), STop(0), Opp[800005], Pos[400005], Val[400005];
+unsigned nn, n, m, A, B, Mx;
 unsigned long long Ans(0), Sum(0);
 char Flg(0);
-inline unsigned long long DFS(unsigned Dep) {
-  for (auto i:List[Dep]) Cur.insert(i);
-//  printf("Size %u %u\n", Cur.size(), List[Dep].size());
-  for (auto i:Cur) printf("%u ", i); putchar(0x0A); 
-  if(!Cur.size()) return 0;
-  if(Cur.size() == 1){
-    unsigned Er(*(Cur.begin()));
-    Cur.erase(Cur.begin());
-    unsigned long long TmpA(DFS(Dep + 1));
-    Cur.insert(Er); 
-    for (auto i:List[Dep]) {
-      multiset<unsigned>::iterator It(Cur.find(i));
-      Cur.erase(It);
-    }
-    printf("Size %u f %u %llu\n", Cur.size(), Dep, TmpA);
-    return TmpA;
-  }
-  unsigned Sz(Cur.size()), Mn(*(Cur.begin())), Mx(*(Cur.rbegin()));
-  Cur.erase(Cur.begin());
-  unsigned long long TmpA(Mn + DFS(Dep + 1));
-  Cur.insert(Mn), Cur.erase(--(Cur.end()));
-  unsigned long long DFSD(DFS(Dep + 1));
-  printf("DFSD %llu %llu -> %llu %llu\n", DFSD, TmpA - Mn, DFSD + Mx, TmpA);
-  TmpA = min(Mx + DFSD, TmpA), Cur.insert(Mx);
-//  TmpA = min(Mx + DFS(Dep + 1), TmpA), Cur.insert(Mx);
-  for (auto i:List[Dep]) {
-    multiset<unsigned>::iterator It(Cur.find(i));
-    Cur.erase(It);
-  }
-  printf("Size %u f %u %llu\n", Cur.size(), Dep, TmpA + (unsigned long long)Mn * (Sz - 2));
-  return (unsigned long long)Mn * (Sz - 2) + TmpA;
-}
 int main() {
-//  freopen("bracket3.in", "r", stdin);
+//  freopen("bracket15.in", "r", stdin);
 //  freopen("bracket.out", "w", stdout);
   nn = ((n = RD()) << 1), A = RD(), B = RD();
   scanf("%s", Br);
@@ -96,9 +64,49 @@ int main() {
     }
     printf("%llu\n", Ans);
     return 0;
+  } 
+  unsigned Beg(1), CurC(0);
+  unsigned long long SumD(0);
+  vector<unsigned> Do;
+  for (; CurC += List[Beg].size(); ++Beg, --CurC) {
+//    printf("CurC %u\n", CurC);
+    if(CurC > 2) break;
+    if(CurC == 2) for (auto i:List[Beg]) SumD += i, Do.push_back(i);
   }
-//  Br[0x3f3f3f3f] = 1;
-  printf("%llu\n", DFS(1));
+//  printf("Beg %u SumD %llu\n", Beg, SumD);
+//  for (auto i:Do) printf("%u ", i); putchar(0x0A);
+  if(!Do.size()) {
+//    printf("Do %u\n", Sum);
+    for (unsigned i(1); List[i].size() + Cur.size(); ++i) {
+      for (auto j:List[i]) Sum += j, Cur.insert(j);
+      if(Cur.size() == 1) continue;
+      if(Cur.size() == 2) {Ans += *(Cur.begin()); break;}
+      Ans += (A = *(++(Cur.begin()))) + (*(Cur.begin())) * (Cur.size() - 2);
+      Sum -= A, Cur.erase(++Cur.begin());
+    }
+    printf("%llu\n", Ans);
+  } else {
+    sort(Do.begin(), Do.end());
+    if(!(List[Beg].size())) {printf("%llu\n", SumD - Do.back()); return 0;}
+    unsigned long long Tmp(SumD - Do[0]);
+    Cur.insert(Do[0]);
+    for (unsigned i(Beg); List[i].size() + Cur.size(); ++i) {
+      for (auto j:List[i]) Sum += j, Cur.insert(j);
+      if(Cur.size() == 1) continue;
+      if(Cur.size() == 2) {Tmp += *(Cur.begin()); break;}
+      Tmp += (A = *(++(Cur.begin()))) + (*(Cur.begin())) * (Cur.size() - 2);
+      Sum -= A, Cur.erase(++Cur.begin());
+    }
+    Cur.clear(), Cur.insert(Do.back()), Ans = SumD - Do.back();
+    for (unsigned i(Beg); List[i].size() + Cur.size(); ++i) {
+      for (auto j:List[i]) Sum += j, Cur.insert(j);
+      if(Cur.size() == 1) continue;
+      if(Cur.size() == 2) {Ans += *(Cur.begin()); break;}
+      Ans += (A = *(++(Cur.begin()))) + (*(Cur.begin())) * (Cur.size() - 2);
+      Sum -= A, Cur.erase(++Cur.begin());
+    }
+    printf("%llu\n", min(Ans, Tmp));
+  }
   return 0;
 }
 /*
