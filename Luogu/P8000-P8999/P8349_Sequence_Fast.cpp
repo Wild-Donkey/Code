@@ -15,23 +15,29 @@
 #include <vector>
 #define Wild_Donkey 0
 using namespace std;
-inline unsigned RD() {
-  unsigned intmp(0);
-  char rdch(getchar());
-  while (rdch < '0' || rdch > '9') rdch = getchar();
-  while (rdch >= '0' && rdch <= '9')
-    intmp = (intmp << 3) + (intmp << 1) + rdch - '0', rdch = getchar();
-  return intmp;
-}
-inline int RDsg() {
-  int rdtp(0), rdsg(1);
-  char rdch(getchar());
-  while ((rdch < '0' || rdch > '9') && (rdch != '-')) rdch = getchar();
-  if (rdch == '-') rdsg = -1, rdch = getchar();
-  while (rdch >= '0' && rdch <= '9')
-    rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
-  return rdtp * rdsg;
-}
+namespace io {
+  const int __SIZE = (1 << 21) + 1;
+  char ibuf[__SIZE], * iS, * iT, obuf[__SIZE], * oS = obuf, * oT = oS + __SIZE - 1, __c, qu[55]; int __f, qr, _eof;
+#define Gc() (iS == iT ? (iT = (iS = ibuf) + fread (ibuf, 1, __SIZE, stdin), (iS == iT ? EOF : *iS ++)) : *iS ++)
+  inline void flush() { fwrite(obuf, 1, oS - obuf, stdout), oS = obuf; }
+  inline void gc(char& x) { x = Gc(); }
+  inline void pc(char x) { *oS++ = x; if (oS == oT) flush(); }
+  inline void pstr(const char* s) { int __len = strlen(s); for (__f = 0; __f < __len; ++__f) pc(s[__f]); }
+  inline void gstr(char* s) {
+    for (__c = Gc(); __c < 32 || __c > 126 || __c == ' ';)  __c = Gc();
+    for (; __c > 31 && __c < 127 && __c != ' '; ++s, __c = Gc()) *s = __c; *s = 0;
+  }
+  template <class I> inline bool gi(I& x) {
+    _eof = 0;
+    for (__f = 1, __c = Gc(); (__c < '0' || __c > '9') && !_eof; __c = Gc()) { if (__c == '-') __f = -1; _eof |= __c == EOF; }
+    for (x = 0; __c <= '9' && __c >= '0' && !_eof; __c = Gc()) x = x * 10 + (__c & 15), _eof |= __c == EOF; x *= __f; return !_eof;
+  }
+  template <class I> inline void print(I x) {
+    if (!x) pc('0'); if (x < 0) pc('-'), x = -x;
+    while (x) qu[++qr] = x % 10 + '0', x /= 10; while (qr) pc(qu[qr--]);
+  }
+  struct Flusher_ { ~Flusher_() { flush(); } }io_flusher_;
+} using io::pc; using io::gc; using io::pstr; using io::gstr; using io::gi; using io::print;
 unsigned a[300005], Sz[300005], Name[300005], Bucket[300005];
 int b[300005];
 long long Sum[300005], Ans[1000005];
@@ -41,46 +47,35 @@ vector<pair<unsigned, int> > Vc[300005];
 struct Ques {
   unsigned Fs, Sc, Num;
   inline void Init() {
-    Num = ++Cnt, Fs = Bucket[RD()], Sc = Bucket[RD()];
+    Num = ++Cnt, gi(A), Fs = Bucket[A], gi(A), Sc = Bucket[A];
     if (Fs < Sc) swap(Fs, Sc);
   }
-  inline const char operator< (const Ques& x) const {
-    return (Fs ^ x.Fs) ? (Fs < x.Fs) : (Sc < x.Sc);
-  }
+  inline const char operator< (const Ques& x) const { return (Fs ^ x.Fs) ? (Fs < x.Fs) : (Sc < x.Sc); }
 }Qst[1000005];
 inline long long Qry(unsigned x) {
   unsigned Siz(Vc[x].size()), Hei[Siz + 3], List[(Siz << 1) + 3];
-  // printf("Qry %u %u\n", x, Siz);
   for (unsigned i(0); i < Siz; ++i) Hei[i + 1] = Siz + Bucket[Vc[x][i].first] - i - 1;
-  // for (unsigned i(1); i <= Siz; ++i) printf("%u ", Hei[i]); putchar(0x0A);
   memcpy(List, Hei, (Siz + 1) << 2);
   for (unsigned i(1); i <= Siz; ++i) List[Siz + i] = List[i] + 1;
   sort(List + 1, List + (Siz << 1) + 1);
-  // for (unsigned i(1); i <= (Siz << 1); ++i) printf("%u ", List[i]); putchar(0x0A);
   unsigned HCnt(unique(List + 1, List + (Siz << 1) + 1) - List - 1);
   List[HCnt + 1] = 0x3f3f3f3f;
-  // for (unsigned i(1); i <= HCnt; ++i) printf("%u ", List[i]); putchar(0x0A);
   long long Shrink[HCnt + 3], Cur(0), Tmp(0xafafafafafafafaf);
   memset(Shrink, 0x3f, (HCnt + 1) << 3);
   unsigned j(0), HC(Siz), Pos(0);
   while (List[j + 1] <= Siz) ++j;
   if (List[j] == Siz) Shrink[j] = 0;
-  // printf("Start From %u\n", j);
   for (unsigned i(1); i <= Siz; ++i) {
     while (List[j + 1] <= Hei[i] + 1) {
       unsigned Fw(min(Mx - Pos, List[++j] - HC));
       if (!Fw) continue;
       Cur -= Sum[Pos], Cur += Sum[Pos += Fw];
-      // printf("Fw %u Cur %lld\n", Fw, Cur);
       HC = List[j], Tmp = max(Tmp, Cur - Shrink[j]);
       Shrink[j] = min(Shrink[j], Cur);
-      // printf("Shrink %u = %lld, Tmp %lld\n", j, Shrink[j], Tmp);
     }
-    // printf("j %u\n", j);
     Cur += Vc[x][i - 1].second, --j;
     --HC, Tmp = max(Tmp, Cur - Shrink[j]);
     Shrink[j] = min(Shrink[j], Cur);
-    // printf("Shrink %u = %lld, Tmp %lld\n", j, Shrink[j], Tmp);
   }
   while (j < HCnt) {
     unsigned Fw(min(Mx - Pos, List[++j] - HC));
@@ -88,36 +83,24 @@ inline long long Qry(unsigned x) {
     Cur -= Sum[Pos], Cur += Sum[Pos += Fw];
     HC = List[j], Tmp = max(Tmp, Cur - Shrink[j]);
     Shrink[j] = min(Shrink[j], Cur);
-    // printf("Shrink %u = %lld, Tmp %lld\n", j, Shrink[j], Tmp);
   }
-  // printf("%lld\n", Tmp);
   return Tmp;
 }
-//  inline void Clr() {}
 signed main() {
   // freopen("P8349_-2.in", "r", stdin);
   // freopen("P8349.out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
-  n = RD(), m = RD(), Thr = (n / (sqrt(m) + 1)) + 1;// Thr = n;
-  // printf("Thr %u\n", Thr);
-  for (unsigned i(1); i <= n; ++i) ++Sz[a[i] = RD()];
-  for (unsigned i(1); i <= n; ++i) b[i] = RDsg();
+  gi(n), gi(m), Thr = (n / (sqrt(m) + 1)) + 1;
+  for (unsigned i(1); i <= n; ++i) gi(a[i]), ++Sz[a[i]];
+  for (unsigned i(1); i <= n; ++i) gi(b[i]);
   for (unsigned i(1); i <= n; ++i) ++Bucket[Sz[i]];
   for (unsigned i(1); i <= n; ++i) Bucket[i] += Bucket[i - 1];
   Thr = Bucket[Thr - 1] + 1;
   for (unsigned i(n); i; --i) Name[Bucket[Sz[i]]--] = i; //Rank
   for (unsigned i(1); i <= n; ++i) Bucket[Name[i]] = i;// Bucket -> Name
-  // for (unsigned i(1); i <= n; ++i) printf("%u ", Name[i]); putchar(0x0A);
-  // for (unsigned i(1); i <= n; ++i) printf("%u ", Bucket[i]); putchar(0x0A);
-  // for (unsigned i(1); i <= n; ++i) printf("%u ", Bucket[a[i]]); putchar(0x0A);
   for (unsigned i(1); i <= n; ++i) Vc[a[i] = Bucket[a[i]]].push_back({ i, b[i] });
   for (unsigned i(1); i <= m; ++i) Qst[i].Init();
   sort(Qst + 1, Qst + m + 1);
-  // for (unsigned i(1); i <= m; ++i) printf("%u %u %u\n", Qst[i].Fs, Qst[i].Sc, Qst[i].Num);
   for (unsigned i(Cnt = 1); i <= m; ++i, ++Cnt) {
-    // printf("Done\n");
     unsigned Cur(Qst[i].Fs);
     if (Cur >= Thr) break;
     unsigned With(Qst[i].Sc), Mxk(Vc[With].size()), Top(Thr + 2), Hei(Top), Bot(Top), k(0);
@@ -143,31 +126,22 @@ signed main() {
     }
     Ans[Qst[i].Num] = Tmp;
   }
-  // printf("Little to Little: %u\n", Cnt - 1);
   for (unsigned i(Cnt); i <= m;) {
     unsigned Cur(Qst[i].Fs);
-    // printf("Big %u\n", Cur);
-    memset(Name, 0, (n + 1) << 2);
     memset(Bucket, 0, (n + 1) << 2);
-    memset(Sum, 0, (n + 1) << 3);
     Sum[0] = 0, Mx = Vc[Cur].size();
-    for (unsigned j(Vc[Cur].size() - 1); ~j; --j)
-      Name[j + 1] = Vc[Cur][j].first, Sum[j + 1] = Vc[Cur][j].second;
+    for (unsigned j(Mx); j; --j) Sum[j] = Vc[Cur][j - 1].second;
     for (auto j : Vc[Cur]) Bucket[j.first] = 1;// Sum[j.first] = j.second;
     for (unsigned j(1); j <= n; ++j) Bucket[j] += Bucket[j - 1];
-    for (unsigned j(1); j <= n; ++j) Sum[j] += Sum[j - 1];
-    // for (unsigned j(1); j <= n; ++j) printf("%u ", Bucket[j]); putchar(0x0A);
-    // for (unsigned j(1); j <= n; ++j) printf("%lld ", Sum[j]); putchar(0x0A);
-    for (unsigned j(i); (Qst[j].Fs == Cur); ++j, ++i) {
-      if ((Qst[j - 1].Fs == Cur) && (Qst[j].Sc == Qst[j - 1].Sc)) {
-        Ans[Qst[j].Num] = Ans[Qst[j - 1].Num];
+    for (unsigned j(1); j <= Mx; ++j) Sum[j] += Sum[j - 1];
+    while (Qst[i].Fs == Cur) {
+      if ((Qst[i - 1].Fs == Cur) && (Qst[i].Sc == Qst[i - 1].Sc)) {
+        Ans[Qst[i].Num] = Ans[Qst[i - 1].Num], ++i;
         continue;
       }
-      Ans[Qst[j].Num] = Qry(Qst[j].Sc);
+      Ans[Qst[i].Num] = Qry(Qst[i].Sc), ++i;
     }
   }
-  for (unsigned i(1); i <= m; ++i) printf("%lld\n", Ans[i]);
-  //  }
-  //  system("pause");
+  for (unsigned i(1); i <= m; ++i) print(Ans[i]), pc(0x0A);
   return Wild_Donkey;
 }
