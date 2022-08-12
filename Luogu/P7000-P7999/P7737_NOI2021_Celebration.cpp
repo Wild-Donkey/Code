@@ -35,38 +35,40 @@ unsigned A, B, C, D, t;
 unsigned Cnt(0), Ans(0), Tmp(0);
 struct Node {
   vector<Node*> Son;
-  Node *Fa, *Heavy, *Top;
+  Node* Fa, * Heavy, * Top;
   unsigned DFSr, Val, Size;
   inline void DFS1();
   inline void DFS2();
-} N[300005], *CntN(N), *Qr[3][2];
+} N[300005], * CntN(N), * Qr[3][2];
 struct Ori {
   vector<Ori*> E;
   Node* Bel;
   unsigned DFSr, Low;
   char Ist;
   inline void Tarjan();
-} OrN[300005], *Stack[300005], **STop(Stack);
+} OrN[300005], * Stack[300005], ** STop(Stack);
 struct Seg {
-  Seg *LS, *RS;
+  Seg* LS, * RS;
   unsigned Val;
   inline void Build(unsigned L, unsigned R);
   inline void Qry(unsigned L, unsigned R);
-} S[600005], *CntS(S);
+} S[600005], * CntS(S);
 struct Edge;
 struct Vir {
   Node* Nd;
   vector<Edge*> E, IE;
   char Tag;
-  inline const char operator<(const Vir& x) const {
-    return Nd->DFSr < x.Nd->DFSr;
-  }
-} V[20];
+  inline const char operator<(const Vir& x) const { return Nd->DFSr < x.Nd->DFSr; }
+  inline const char operator==(const Vir& x) const { return Nd == x.Nd; }
+  inline void DFS1();
+  inline void DFS2();
+} V[20], * CntV(V);
 struct Edge {
   Vir* To[2];
   unsigned Val;
-} Ed[40], *CntE(Ed);
+} Ed[40], * CntE(Ed);
 inline void Ori::Tarjan() {
+  // printf("Tarjan %u\n", this - OrN);
   Low = DFSr = ++Cnt, Ist = 1, *(++STop) = this;
   for (auto i : E) {
     if (!(i->DFSr)) i->Tarjan();
@@ -74,7 +76,7 @@ inline void Ori::Tarjan() {
   }
   if (Low == DFSr) {
     Node* Cur(++CntN);
-    do (*STop)->Bel = Cur, (*STop)->Ist;
+    do (*STop)->Bel = Cur, (*STop)->Ist = 0, ++(Cur->Val);
     while (*(STop--) != this);
   }
 }
@@ -145,37 +147,52 @@ inline void Link_Zero(Vir* x, Vir* y) {
   y->IE.push_back(CntE);
 }
 inline void Build() {
-  Vir *StkN[20], **SNTop(StkN);
+  Vir* StkN[20], ** SNTop(StkN), * CntVa(CntV);
   *(++SNTop) = V + 1;
-  unsigned CntAdd(Cnt);
-  for (unsigned i(2); i <= CntAdd; ++i) {
-    Node* Cur(LCA(V[i].Nd, (*SNTop)->Nd));
-    while (Cur > (*(SNTop - 1))->Nd) Link(*(SNTop - 1), *SNTop), --SNTop;
-    if (Cur == (*SNTop - 1)->Nd) {
-      Link(*(SNTop - 1), *SNTop), --SNTop;
-    } else {
-      Link(V + (++Cnt), *SNTop), --SNTop;
-      (*(++SNTop) = V + Cnt)->Nd = Cur;
+  for (Vir* i(V + 2); i <= CntVa; ++i) {
+    Node* Cur(LCA(i->Nd, (*SNTop)->Nd));
+    // printf("LCA (%u, %u) %u\n", i->Nd - N, (*SNTop)->Nd - N, Cur - N);
+    while ((SNTop - 1 > StkN) && (Cur > (*(SNTop - 1))->Nd)) Link(*(SNTop - 1), *SNTop), --SNTop;
+    // for (Vir** j(StkN + 1); j <= SNTop; ++j) printf("%u ", (*j)->Nd - N); putchar(0x0A);
+    if ((*SNTop)->Nd != Cur) {
+      if (Cur == (*(SNTop - 1))->Nd) Link(*(SNTop - 1), *SNTop), --SNTop;
+      else (++CntV)->Nd = Cur, Link(CntV, *SNTop), * (SNTop) = CntV;
     }
-    *(++SNTop) = V + i;
+    *(++SNTop) = i;
+    // for (Vir** j(StkN + 1); j <= SNTop; ++j) printf("%u ", (*j)->Nd - N); putchar(0x0A);
   }
+  // printf("Done\n");
   while (SNTop - 1 > StkN) Link(*(SNTop - 1), *SNTop), --SNTop;
 }
-inline void Clr() { Cnt = 0, CntE = Ed; }
+inline void Vir::DFS1() {
+  // printf("DFS1 %u\n", this - V);
+  Tag |= 1;
+  for (auto i : E) if (!(i->To[1]->Tag & 1)) i->To[1]->DFS1();
+}
+inline void Vir::DFS2() {
+  // printf("DFS2 %u\n", this - V);
+  Tag |= 2;
+  for (auto i : IE) if (!(i->To[0]->Tag & 2)) i->To[0]->DFS2();
+}
+inline void Clr() {
+  // printf("%u %u\n", CntV - V, CntE - Ed);
+  for (Vir* i(V + 1); i <= CntV; ++i) i->E.clear(), i->IE.clear(), i->Tag = 0;
+  Ans = Cnt = 0, CntE = Ed, CntV = V;
+}
 signed main() {
-  freopen("celebration-1.in", "r", stdin);
-  //  freopen(".out", "w", stdout);
+  // freopen("celebration-5.in", "r", stdin);
+  // freopen("celebration.out", "w", stdout);
   //  t = RD();
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD(), m = RD(), Q = RD(), K = RD();
-  for (unsigned i(1); i <= m; ++i) {
-    A = RD(), B = RD();
-    OrN[A].E.push_back(OrN + B);
-    OrN[B].E.push_back(OrN + A);
-  }
-  for (unsigned i(1); i <= n; ++i)
-    if (!OrN[i].DFSr) OrN[i].Tarjan();
+  // printf("m = %u\n", m);
+  for (unsigned i(1); i <= m; ++i) A = RD(), B = RD(), OrN[A].E.push_back(OrN + B);
+  for (unsigned i(1); i <= n; ++i) if (!OrN[i].DFSr) OrN[i].Tarjan();
+  // printf("Done\n");
+  // printf("DFSr "); for (unsigned i(1); i <= n; ++i) printf("%u ", OrN[i].DFSr); putchar(0x0A);
+  // printf("Low "); for (unsigned i(1); i <= n; ++i) printf("%u ", OrN[i].Low); putchar(0x0A);
+  // printf("Bel "); for (unsigned i(1); i <= n; ++i) printf("%u ", OrN[i].Bel - N); putchar(0x0A);
   m = CntN - N;
   for (unsigned i(1); i <= n; ++i) {
     Node* Cur(OrN[i].Bel);
@@ -183,20 +200,30 @@ signed main() {
       if ((j->Bel != Cur) && ((!(j->Bel->Fa)) || (j->Bel->Fa > Cur)))
         j->Bel->Fa = Cur;
   }
+  // printf("Fa "); for (unsigned i(1); i <= m; ++i) printf("%u ", N[i].Fa - N); putchar(0x0A);
   for (Node* i(N + 1); i < CntN; ++i) i->Fa->Son.push_back(i);
   Cnt = 0, CntN->DFS1(), CntN->Top = CntN, CntN->DFS2(), S->Build(1, m);
+  // printf("Val "); for (unsigned i(1); i <= m; ++i) printf("%u ", N[i].Val); putchar(0x0A);
   for (unsigned i(1); i <= Q; ++i) {
     Clr();
     map<Node*, Vir*> Mp;
-    V[Cnt = 1].Nd = CntN;
-    for (unsigned j(0); j <= K; ++j)
-      V[++Cnt].Nd = Qr[j][0] = OrN[RD()].Bel,
-      V[++Cnt].Nd = Qr[j][1] = OrN[RD()].Bel;
-    sort(V + 1, V + (K << 1)), Cnt = unique(V + 1, V + Cnt + 1) - V;
-    for (unsigned j(1); j <= Cnt; ++j) Mp[V[j].Nd] = V + j;
+    (++CntV)->Nd = CntN;
+    for (unsigned j(0); j <= K; ++j) {
+      (++CntV)->Nd = Qr[j][0] = OrN[RD()].Bel;
+      (++CntV)->Nd = Qr[j][1] = OrN[RD()].Bel;
+    }
+    // printf("Real "); for (Vir* j(V + 1); j <= CntV; ++j) printf("%u ", j->Nd - N); putchar(0x0A);
+    sort(V + 1, CntV + 1), CntV = unique(V + 1, CntV + 1) - 1;
+    // printf("Real "); for (Vir* j(V + 1); j <= CntV; ++j) printf("%u ", j->Nd - N); putchar(0x0A);
+    for (Vir* j(V + 1); j <= CntV; ++j) Mp[j->Nd] = j;
     for (unsigned j(1); j <= K; ++j) Link_Zero(Mp[Qr[j][0]], Mp[Qr[j][1]]);
-    Mp[Qr[0][0]]->DFS1(), Mp Build();
+    Build();
+    // printf("Edges "); for (Edge* j(Ed + 1); j <= CntE; ++j) printf("%u-%u ", j->To[0]->Nd - N, j->To[1]->Nd - N); putchar(0x0A);
+    Mp[Qr[0][0]]->DFS1(), Mp[Qr[0][1]]->DFS2();
+    for (Edge* j(Ed + 1); j <= CntE; ++j) if (((j->To[0]->Tag) & (j->To[1]->Tag)) == 3) Ans += j->Val;
+    for (Vir* j(V + 1); j <= CntV; ++j) if (j->Tag == 3) Ans += j->Nd->Val;// printf("Added %u\n", j - V);
+    printf("%u\n", Ans);
   }
   return Wild_Donkey;
 }
-// g++ P7737_NOI2021_Celebration.cpp -o faq -std=c++14 -O2
+// g++ P7737_NOI2021_Celebration.cpp -o faq -std=c++14 -O2 -Wl,--stack=1024000000
