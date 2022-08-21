@@ -17,11 +17,14 @@ void gen(int n, ull a1, ull a2) {
     for (int j = 0; j < 256; j++)
       s[i][j] = (myRand(a1, a2) & (1ull << 32)) ? 1 : 0;
   for (unsigned i(1); i <= n; ++i) {
-    for (int j = 0; j < 256; j++) printf("%u,", s[i][j]); putchar(0x0A);
+    for (int j = 0; j < 256; j++) printf("%u", s[i][j]);
+    putchar(0x0A);
   }
 }
 
 int main() {
+  freopen("Test.in", "w", stdout);
   gen(10, 123, 123);
   return 0;
 }
+// g++ P7738_gen.cpp -o gen -std=c++14 -O2 -Wl,--stack=1024000000
