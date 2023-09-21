@@ -82,8 +82,8 @@ signed main() {
   // if (n >= 5) return 0;
   for (unsigned i(1); i <= n; ++i)
     if (!(N[i].Tag)) N[i].DFS();
-  // for (unsigned i(1); i <= n; ++i) printf("%u ", N[i].Bel - Bl);
-  // putchar(0x0A);
+//   for (unsigned i(1); i <= n; ++i) printf("%u ", N[i].Bel - Bl);
+//   putchar(0x0A);
   // for (unsigned i(1); i <= n; ++i) printf("%u ", Fa[i]);
   // putchar(0x0A);
   for (unsigned i(1); i <= n; ++i) ++Sz[Find(i)];
