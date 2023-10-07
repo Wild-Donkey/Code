@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -34,19 +36,18 @@ inline int RDsg() {
 unsigned a[10005], m, n;
 unsigned A, B, C, D, t;
 unsigned Cnt(0), Ans(0), Tmp(0);
-inline void Clr() {
-  n = RD(), Ans = 100;
-}
+char S[20];
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
-  t = RD();
-  for (unsigned T(1); T <= t; ++T) {
-    Clr();
-    while ((!(Ans % 2)) && (!(n % 2))) Ans /= 2, n /= 2;
-    while ((!(Ans % 5)) && (!(n % 5))) Ans /= 5, n /= 5;
-    printf("%u\n", Ans);
-  }
-  // system("pause");
+  //  t = RD();
+  //  for (unsigned T(1); T <= t; ++T){
+  //  Clr();
+  scanf("%s", S + 1);
+  for (unsigned i(2); i <= 16; i += 2) Cnt += S[i] - '0';
+  printf(Cnt ? "No\n" : "Yes\n");
+  //  }
+  //  system("pause");
   return Wild_Donkey;
 }
