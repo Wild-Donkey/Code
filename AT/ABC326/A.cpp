@@ -43,10 +43,11 @@ signed main() {
   //  t = RD();
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) {
-    a[i] = RD();
-  }
+  A = RD(), B = RD();
+  if (A <= B)
+    printf((A + 2 >= B) ? "Yes\n" : "No\n");
+  else
+    printf((A <= B + 3) ? "Yes\n" : "No\n");
   //  }
   //  system("pause");
   return Wild_Donkey;
