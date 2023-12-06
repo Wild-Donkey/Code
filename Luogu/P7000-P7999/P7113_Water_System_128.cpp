@@ -16,36 +16,37 @@ inline unsigned RD() {
     TmpRD = (TmpRD << 3) + (TmpRD << 1) + TmpRC - '0', TmpRC = getchar();
   return TmpRD;
 }
-unsigned long long Gcd(unsigned long long x, unsigned long long y) {
-  unsigned long long TmpG;
+unsigned __int128 Gcd(unsigned __int128 x, unsigned __int128 y) {
+  unsigned __int128 TmpG;
   while (y > 0) TmpG = x, x = y, y = TmpG % y;
   return x;
 }
+inline void Prtn(unsigned __int128 x) {
+  char Stack[50], *STop(Stack);
+  while (x) *(++STop) = (x % 10) + '0', x /= 10;
+  while (STop > Stack) putchar(*(STop--));
+}
 struct Div {
-  unsigned long long Up, Down;
+  unsigned __int128 Up, Down;
   inline Div operator+(Div x) {
-    //    printf("Pls %Lf %Lf\n", Up / Down, x.Up / x.Down);
     Div TmpP(*this);
-    unsigned long long G(Gcd(Down, x.Down));
+    unsigned __int128 G(Gcd(Down, x.Down));
     x.Down = x.Down / G, Down = Down / G;
     TmpP.Up = (x.Up * Down) + (Up * x.Down);
     Down *= G;
     TmpP.Down = x.Down * Down;
     G = Gcd(TmpP.Up, TmpP.Down);
     TmpP.Up /= G, TmpP.Down /= G;
-    //    printf("Plused %Lf %Lf\n", TmpP.Up, TmpP.Down);
     return TmpP;
   }
-  inline Div Di(unsigned long long x) {
-    //    printf("Divi %Lf %Lf / %u\n", Up, Down, x);
+  inline Div Di(unsigned __int128 x) {
     Div TmpP(*this);
-    long double G(Gcd(Up, (long double)x));
+    unsigned __int128 G(Gcd(Up, x));
     TmpP.Up /= G, x /= G, TmpP.Down *= x;
-    //    printf("Got %Lf %Lf\n", TmpP.Up, TmpP.Down);
     return TmpP;
   }
-  inline void Set(unsigned long long x) { Down = 1, Up = x; }
-  inline void Prt() { printf("%llu %llu\n", Up, Down); }
+  inline void Set(unsigned __int128 x) { Down = 1, Up = x; }
+  inline void Prt() { Prtn(Up), putchar(' '), Prtn(Down), putchar(0x0A); }
 };
 struct Node {
   vector<Node*> E;
@@ -69,17 +70,14 @@ signed main() {
       ++(N[B].Idg);
     }
   }
-  for (unsigned i(1); i <= n; ++i)
-    if (!(N[i].Idg)) Q[++Tl] = N + i, N[i].Val.Set(1);
+  for (unsigned i(1); i <= m; ++i) Q[++Tl] = N + i, N[i].Val.Set(1);
   while (Hd < Tl) {
     Node* Cur(Q[++Hd]);
-    //    printf("Cur %u\n", Cur - N);
     for (auto i : Cur->E)
       if (!(--(i->Idg))) Q[++Tl] = i;
   }
   for (unsigned i(1); i <= n; ++i) {
     if (!(Q[i]->Odg)) continue;
-    //    printf("Do %u %Lf %Lf\n", Q[i] - N, Q[i]->Val.Up, Q[i]->Val.Down);
     Div No(Q[i]->Val.Di(Q[i]->Odg));
     for (auto j : Q[i]->E) j->Val = j->Val + No;
   }
