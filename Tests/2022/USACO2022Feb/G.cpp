@@ -37,11 +37,6 @@ char IO[20];
 unsigned Cnt(0), Ans(0), Tmp(0);
 //  inline void Clr() {}
 signed main() {
-  //  freopen(".in", "r", stdin);
-  //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
   N = (1 << (n = RD()));
   for (unsigned i(0); i < n; ++i) {
     char Flg(1);
@@ -51,46 +46,32 @@ signed main() {
       if (Tmp == i) Flg = 0;
     }
   }
-  // for (unsigned i(0); i < n; ++i) {
-  //   printf("Edge From %u:", i);
-  //   for (unsigned j(0); j < n; ++j) putchar(((Ed[i] >> j) & 1) ? '1' : '0'); putchar(0x0A);
-  // }
-  for (unsigned i(0); i < n; ++i) h[1 << i][i] = 1; h[0][0] = 1;
+  for (unsigned i(0); i < n; ++i) h[1 << i][i] = 1;
+  h[0][0] = 1;
   for (unsigned i(1); i < N; ++i) {
     unsigned Low(0);
     while ((1 << Low) <= (i >> 1)) ++Low;
-    for (unsigned End(0); End <= Low; ++End) if (((i >> End) & 1)) {
-      if ((Ed[End] >> Low) & 1) g[i] += h[i][End];
-      // printf("i %u End %u\n", i, End);
-      for (unsigned To(0); To < Low; ++To) if ((!((i >> To) & 1)) && ((Ed[End] >> To) & 1)) {
-        h[i | (1 << To)][To] += h[i][End];
+    for (unsigned End(0); End <= Low; ++End)
+      if (((i >> End) & 1)) {
+        if ((Ed[End] >> Low) & 1) g[i] += h[i][End];
+        // printf("i %u End %u\n", i, End);
+        for (unsigned To(0); To < Low; ++To)
+          if ((!((i >> To) & 1)) && ((Ed[End] >> To) & 1)) {
+            h[i | (1 << To)][To] += h[i][End];
+          }
       }
-    }
   }
   f[0] = g[0] = 1;
-  // for (unsigned i(0); i < N; ++i) {
-  //   printf("Set Link %u:", i);
-  //   for (unsigned j(0); j < n; ++j) putchar(((i >> j) & 1) ? '1' : '0'); putchar(0x0A);
-  //   printf("End Up:");
-  //   for (unsigned j(0); j < n; ++j) putchar((h[j][i]) ? '1' : '0'); putchar(0x0A);
-  // }
-  // for (unsigned i(0); i < N; ++i) {
-  //   printf("Set %u %c:", i, (g[i] ? 'Y' : 'N'));
-  //   for (unsigned j(0); j < n; ++j) putchar(((i >> j) & 1) ? '1' : '0'); putchar(0x0A);
-  // }
   for (unsigned i(0); i < N; ++i) {
     unsigned Low(0);
     while ((1 << Low) <= (i >> 1)) ++Low;
-    for (unsigned j(i); j >> Low; j = (j - 1) & i) {
-      f[i] += f[i ^ j] * g[j];
-    }
-    // for (unsigned j(0); j < n; ++j) putchar(((i >> j) & 1) ? '1' : '0'); printf(":%llu ", f[i]);
+    for (unsigned j(i); j >> Low; j = (j - 1) & i) f[i] += f[i ^ j] * g[j];
   }
-  // putchar(0x0A);
   m = RD(), --N;
   for (unsigned i(1); i <= m; ++i) {
     scanf("%s", IO), Cnt = 0;
-    for (unsigned j(0); j < n; ++j) if (IO[j] == 'G') Cnt |= (1 << j);
+    for (unsigned j(0); j < n; ++j)
+      if (IO[j] == 'G') Cnt |= (1 << j);
     printf("%llu\n", f[Cnt] * f[N ^ Cnt]);
   }
   //  }

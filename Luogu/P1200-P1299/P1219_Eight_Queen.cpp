@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,16 +33,25 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
-unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+unsigned Plan[15], Col[15], Dia[2][30], m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+void DFS(unsigned Dep) {
+  if (Dep == n + 1) {
+    if (++Ans <= 3) {
+      for (unsigned i(1); i <= n; ++i) printf("%u ", Plan[i]);
+      putchar(0x0A);
+    }
+    return;
+  }
+  for (unsigned i(1), j(i + Dep), k(Dep + 15 - i); i <= n; ++i, ++j, --k)
+    if ((!Col[i]) && (!Dia[0][j]) && (!Dia[1][k])) {
+      Col[i] = 1, Dia[0][j] = 1, Dia[1][k] = 1;
+      Plan[Dep] = i, DFS(Dep + 1);
+      Col[i] = 0, Dia[0][j] = 0, Dia[1][k] = 0;
+    }
 }
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
@@ -48,18 +59,9 @@ signed main() {
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
-    }
-  }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
+  DFS(1);
+  printf("%u\n", Ans);
   //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

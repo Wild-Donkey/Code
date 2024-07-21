@@ -13,9 +13,7 @@ using namespace std;
 inline unsigned int RD() {
   unsigned int intmp = 0;
   char rdch(getchar());
-  while (rdch < '0' || rdch > '9') {
-    rdch = getchar();
-  }
+  while (rdch < '0' || rdch > '9') { rdch = getchar(); }
   while (rdch >= '0' && rdch <= '9') {
     intmp = intmp * 10 + rdch - '0';
     rdch = getchar();
@@ -25,9 +23,7 @@ inline unsigned int RD() {
 inline int RDsg() {
   int rdtp(0), rdsg(1);
   char rdch(getchar());
-  while ((rdch < '0' || rdch > '9') && (rdch != '-')) {
-    rdch = getchar();
-  }
+  while ((rdch < '0' || rdch > '9') && (rdch != '-')) { rdch = getchar(); }
   if (rdch == '-') {
     rdsg = -1;
     rdch = getchar();
@@ -38,35 +34,25 @@ inline int RDsg() {
   }
   return rdtp * rdsg;
 }
-unsigned int a[100005], b[100005], f[100005], m, n, Cnt(0), A, B, C, D, t;
-char s[10005];
-inline void Clr() {
-  n = RD();
-  memset(a, 0, sizeof(a));
-}
+unsigned a[100005], b[100005], f[100005], n;
 int main() {
   // double Ti(clock()), Mti(0);
   // freopen(".in", "r", stdin);
   // freopen(".out", "w", stdout);
   n = RD();
-  for (register unsigned int i(1); i <= n; ++i) {
-    b[RD()] = i;//ai 在 a 中的位置 
-  }
-  for (register unsigned int i(1); i <= n; ++i) {
-    a[i] = b[RD()];
-  }
-  for (register unsigned int i(1); i <= n; ++i) {
-    
-  }
+  for (unsigned i(1); i <= n; ++i) b[RD()] = i;
+  for (unsigned i(1); i <= n; ++i) a[i] = b[RD()];
+  memset(f, 0x3f, (n + 2) << 2);
   f[0] = 0;
-  for (register unsigned int i(1); i <= n; ++i) {
-    if(f[Cnt] < a[i]) {
-      f[++Cnt] = a[i];
-      continue;
-    }
-    *(lower_bound(f + 1, f + Cnt + 1, a[i])) = a[i];
+  for (unsigned i(1); i <= n; ++i) {
+    unsigned *Tmp(lower_bound(f, f + n + 1, a[i]));
+    if (*(Tmp - 1) < a[i]) *Tmp = a[i];
   }
-  printf("%u\n", Cnt);
+  for (unsigned i(n); i; --i)
+    if (f[i] < 0x3f3f3f3f) {
+      printf("%u\n", i);
+      return 0;
+    }
   // Ti = clock() - Ti;
   // printf("Time %lf MTime %lf\n", Ti, Mti);
   // system("pause");
@@ -74,5 +60,3 @@ int main() {
   // fclose(stdout);
   return Wild_Donkey;
 }
-
-
