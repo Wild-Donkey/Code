@@ -32,7 +32,7 @@ unsigned RangeToPos(unsigned L, unsigned R, unsigned P) {
 }
 unsigned Calc(unsigned Mid, unsigned Rig) {
   return RangeToPos(1, Mid - 1, 0) + RangeToPos(Mid, Rig - 1, Pos[Mid]) +
-         RangeToPos(Rig, n, Pos[Rig]);
+    RangeToPos(Rig, n, Pos[Rig]);
 }
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -46,12 +46,20 @@ signed main() {
   for (unsigned i(1); i <= n; ++i) SumPosw[i] = SumPosw[i - 1] + Pos[i] * w[i];
   for (unsigned i(1); i <= n; ++i) Sumw[i] = Sumw[i - 1] + w[i];
   deque<pair<unsigned, unsigned> > Best;
-  Best.push_back({1, 2});
+  Best.push_back({ 1, 2 });
   for (unsigned i(2); i <= n; ++i) {
-    Ans = min(Ans, Calc(Best.back().first, i));
+    // for (auto i : Best) printf("(%u,%u)", i.first, i.second);
+    // putchar(0x0A);
+    while (Best.size() > 1)
+      if (Best[1].second <= i) Best.pop_front();
+      else break;
+    // for (auto i : Best) printf("(%u,%u)", i.first, i.second);
+    // putchar(0x0A);
+    Ans = min(Ans, Calc(Best.front().first, i));
+    // printf("Here %u, %u = %u\n", Best.front().first, i, Ans);
     while (Best.size() && Best.back().second > i &&
-           Calc(i, Best.back().second) <
-               Calc(Best.back().first, Best.back().second))
+      Calc(i, Best.back().second) <
+      Calc(Best.back().first, Best.back().second))
       Best.pop_back();
     if (Best.size()) {
       unsigned L(i + 1), R(n), Mid;
@@ -62,13 +70,14 @@ signed main() {
         else
           L = Mid + 1;
       }
-      Best.push_back({i, L});
+      Best.push_back({ i, L });
+      // printf("%u as the best from %u\n", i, L);
     } else
-      Best.push_back({i, i + 1});
+      Best.push_back({ i, i + 1 });
   }
   printf("%u\n", Ans);
   //  }
-  //  system("pause");
+  //  system("pause"); 
   return Wild_Donkey;
 }
 /*
