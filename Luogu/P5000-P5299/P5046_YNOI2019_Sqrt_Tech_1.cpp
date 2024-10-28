@@ -20,8 +20,8 @@ inline int RDsg() {
 }
 unsigned a[110005], Lef[110005], Rig[110005];
 pair<unsigned, unsigned> b[110005];
-unsigned long long BlA[320][320];
-unsigned Pool[2][32000005], Buck[110005];
+unsigned long long BlA[530][530];
+unsigned Pool[53000005], Buck[110005];
 unsigned m, n, Len, Bl;
 unsigned A, B;
 unsigned long long Ans(0);
@@ -30,21 +30,18 @@ unsigned Count(unsigned ll, unsigned lr, unsigned rl, unsigned rr) {
   unsigned lb(ll / Len), rb(rl / Len), CurC(0), Rt(0);
   unsigned llim((lb + 1) * Len), rlim((rb + 1) * Len);
   for (unsigned i(lb* Len), j(rb* Len); i < llim; ++i) {
-    while (j < rlim && b[j].first <= b[i].first)
+    while (j < rlim && b[j] <= b[i])
       CurC += (b[j].second >= rl && b[j].second <= rr), ++j;
     if (b[i].second >= ll && b[i].second <= lr) Rt += CurC;
   }
-  // printf("[%u,%u] [%u,%u] = %u\n", ll, lr, rl, rr, Rt);
   return Rt;
 }
-unsigned& Get(unsigned* x, unsigned Val, unsigned Blc) { return x[(Blc + 1) * (n + 1) + Val]; }
 unsigned Dot_Seg(unsigned dl, unsigned dr, unsigned bl, unsigned br) {
-  unsigned* My = (dl < bl * Len ? Pool[0] : Pool[1]);
-  unsigned long long Rt = 0;
-  for (unsigned i(dl); i <= dr; ++i)
-    Rt += Get(My, a[i], br) - Get(My, a[i], bl - 1);
-  printf("Dot [%u,%u] Seg [%u,%u] %u\n", dl, dr, bl, br, Rt);
-  return Rt;
+  unsigned* Mr(Pool + (br + 1) * (n + 1)), * Ml(Pool + (bl) * (n + 1));
+  unsigned Rt = 0;
+  for (unsigned i(dl); i <= dr; ++i) Rt += Mr[a[i]] - Ml[a[i]];
+  // printf("Dot [%u,%u] Seg [%u,%u] %u\n", dl, dr, bl, br, Rt);
+  return (dl < bl * Len) ? Rt : (dr - dl + 1) * (br - bl + 1) * Len - Rt;
 }
 signed main() {
   //  freopen(".in", "r", stdin);
@@ -52,7 +49,7 @@ signed main() {
   //  t = RD();
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
-  n = RD(), m = RD(), Len = sqrt(n) + 1;
+  n = RD(), m = RD(), Len = sqrt(n) * 0.6 + 1;
   // for (unsigned i(0); i < n; ++i) a[i] = i + 1;
   for (unsigned i(0); i < n; ++i) a[i] = RD();
   while (n % Len) a[n] = n + 1, ++n;
@@ -72,21 +69,19 @@ signed main() {
   // for (unsigned i(0); i < n; ++i) printf("%u ", a[i]); putchar(0x0A);
   for (unsigned i(0); i < n; i += Len) sort(b + i, b + i + Len);
   // printf("Cur Bl %u\n", Bl);
-  for (unsigned i(0), j(0); i < n; ++i) {
+  for (unsigned i(0), j(0), *K(Pool + (n + 1)); i < n; ++i) {
     ++Buck[a[i]];
     if (!((i + 1) % Len)) {
-      memcpy(Pool[0] + (j + 1) * (n + 1), Buck, (n + 1) << 2);
-      // printf("Pos %u Bl %u\n", (j + 2) * (n + 1), Bl);
-      memcpy(Pool[1] + (j + 1) * (n + 1), Buck, (n + 1) << 2);
-      for (unsigned k(2), *K(Pool[0] + (j + 1) * (n + 1) + 2); k <= n; ++k, ++K) *K += *(K - 1);
-      for (unsigned k(n), *K(Pool[1] + (j + 2) * (n + 1) - 1); k > 1; --k, --K) *(K - 1) += *K;
-      ++j;
+      memcpy(K, Buck, (n + 1) << 2);
+      for (unsigned k(2); k <= n; ++k) K[k] += K[k - 1];
+      ++j, K += n + 1;
     }
   }
   // printf("Cur Bl %u\n", Bl);
-  for (unsigned i(0); i < Bl; --i) BlA[i][i] = Rig[i * Len];
+  for (unsigned i(0); i < Bl; ++i) BlA[i][i] = Rig[i * Len];
   for (unsigned i(Bl - 2); ~i; --i) {
     for (unsigned j(i + 1); j < Bl; ++j) {
+      // printf("Here %u %u\n", i, j);
       BlA[i][j] = BlA[i][j - 1] + BlA[i + 1][j] - BlA[i + 1][j - 1];
       BlA[i][j] += Count(i * Len, (i + 1) * Len - 1, j * Len, (j + 1) * Len - 1);
     }
@@ -98,26 +93,24 @@ signed main() {
   // for (unsigned i(0); i < n; ++i) printf("%3u", a[i]); putchar(0x0A);
   // for (unsigned i(0); i < n; ++i) printf("%3u", Lef[i]);putchar(0x0A);
   // for (unsigned i(0); i < n; ++i) printf("%3u", Rig[i]);putchar(0x0A);
+  // return 0;
   for (unsigned i(1); i <= m; ++i) {
-    // A = (RD() ^ Ans) - 1, B = (RD() ^ Ans) - 1;
-    A = RD() - 1, B = RD() - 1;
-    if (B < A) { Ans = 0, printf("0\n"); continue; }
+    A = (RD() ^ Ans) - 1, B = (RD() ^ Ans) - 1, Ans = 0;
+    // A = RD() - 1, B = RD() - 1, Ans = 0;
     if (A / Len == B / Len) {
       if (A % Len)
         Ans = Lef[B] - Lef[A - 1] - Count((A / Len) * Len, A - 1, A, B);
       else Ans = Lef[B];
     } else {
       unsigned bl(A / Len), br(B / Len);
-      Ans = 0;
       if (A % Len) ++bl, Ans += Rig[A];
       if ((B + 1) % Len) --br, Ans += Lef[B];
       // printf("[%u,%u] bl %u br %u Ans %llu\n", A, B, bl, br, Ans);
       Ans += BlA[bl][br];
-      printf("%llu\n", Ans);
+      // printf("%llu\n", Ans);
       if (A % Len) Ans += Dot_Seg(A, bl * Len - 1, bl, br);
       if ((B + 1) % Len) Ans += Dot_Seg((br + 1) * Len, B, bl, br);
-      if (A % Len && (B + 1) % Len)
-        Ans += Count(A, bl * Len - 1, (br + 1) * Len, B);
+      if (A % Len && (B + 1) % Len) Ans += Count(A, bl * Len - 1, (br + 1) * Len, B);
     }
     printf("%llu\n", Ans);
   }
@@ -139,4 +132,16 @@ signed main() {
 1 1
 4 4
 10 10
+
+1
+31
+14
+1
+12
+10
+9
+5
+0
+0
+0
 */
