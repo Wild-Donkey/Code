@@ -90,8 +90,8 @@ inline void Rotate(Node *x) {
 }
 void Splay (Node *x) {
   register unsigned Head(0);
-  while (x->Fa) {                                       // ¸¸Ç×Ã»µ½Í·
-    if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {      // x is the preferred-edge linked son (Êµ±ßÁ¬½ÓµÄ¶ù×Ó)
+  while (x->Fa) {                                       // ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Í·
+    if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {      // x is the preferred-edge linked son (Êµï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ¶ï¿½ï¿½ï¿½)
       Stack[++Head] = x;
       x = x->Fa;
       continue;
@@ -104,14 +104,14 @@ void Splay (Node *x) {
       Push_Down(Stack[i]);
     }
     x = Stack[1];
-    while (x->Fa) {                                     // ¸¸Ç×Ã»µ½Í·
-      if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {  // x is the preferred-edge linked son (Êµ±ßÁ¬½ÓµÄ¶ù×Ó)
+    while (x->Fa) {                                     // ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Í·
+      if(x->Fa->Son[0] == x || x->Fa->Son[1] == x) {  // x is the preferred-edge linked son (Êµï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ¶ï¿½ï¿½ï¿½)
         if (x->Fa->Fa) {
           if (x->Fa->Fa->Son[0] == x->Fa || x->Fa->Fa->Son[1] == x->Fa) { // Father
   			    Rotate((x->Fa->Son[0] == x)^(x->Fa->Fa->Son[0] == x->Fa) ? x : x->Fa);
           }                      // End
         }
-        Rotate(x);               //×îºóÒ»´ÎÐý×ª
+        Rotate(x);               //ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½×ª
       }
       else {
         break;
@@ -149,32 +149,32 @@ int main() {
     C = RD();
     switch (A) {
       case 0: { // Query
-        Access(N + B), Splay(N + B), N[B].Tag ^= 1; // x Îª¸ù 
-        Access(N + C);    // y ºÍ x ÎªÍ¬Ò»ÊµÁ´Á½¶Ë
-        Splay(N + C);     // y ÎªËùÔÚÊµÁ´µÄ Splay µÄ¸ù 
+        Access(N + B), Splay(N + B), N[B].Tag ^= 1; // x Îªï¿½ï¿½ 
+        Access(N + C);    // y ï¿½ï¿½ x ÎªÍ¬Ò»Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Splay(N + C);     // y Îªï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ Splay ï¿½Ä¸ï¿½ 
         printf("%u\n", N[C].Sum);
         break;
       }
       case 1: { // Link
-        Access(N + B), Splay(N + B), N[B].Tag ^= 1;         // x Îª¸ù, Ò²ÊÇËùÔÚ Splay µÄ¸ù
-        if(Find_Root(N + C) != N + B) {// x, y ²»Á¬Í¨, x ÔÚ Fink_Root Ê±ÒÑ¾­ÊÇËüËùÔÚ Splay µÄ¸ùÁË, Ò²ÊÇËüÔ­Ê÷¸ùËùÔÚÊµÁ´¶¥, ×ó×ÓÊ÷Îª¿Õ 
-          N[B].Fa = N + C;        // ¸¸Ö¸Õë
+        Access(N + B), Splay(N + B), N[B].Tag ^= 1;         // x Îªï¿½ï¿½, Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Splay ï¿½Ä¸ï¿½
+        if(Find_Root(N + C) != N + B) {// x, y ï¿½ï¿½ï¿½ï¿½Í¨, x ï¿½ï¿½ Fink_Root Ê±ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Splay ï¿½Ä¸ï¿½ï¿½ï¿½, Ò²ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ 
+          N[B].Fa = N + C;        // ï¿½ï¿½Ö¸ï¿½ï¿½
         }
         break;
       }
       case 2: { // Cut
-        Access(N + B), Splay(N + B), N[B].Tag ^= 1;                         // x Îª¸ù, Ò²ÊÇËùÔÚ Splay µÄ¸ù
-        if(Find_Root(N + C) == N + B) {           // x, y Á¬Í¨ 
+        Access(N + B), Splay(N + B), N[B].Tag ^= 1;                         // x Îªï¿½ï¿½, Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Splay ï¿½Ä¸ï¿½
+        if(Find_Root(N + C) == N + B) {           // x, y ï¿½ï¿½Í¨ 
           if(N[B].Fa == N + C && !(N[B].Son[1])) {
-            N[B].Fa = N[C].Son[0] = NULL;         // ¶Ï±ß
+            N[B].Fa = N[C].Son[0] = NULL;         // ï¿½Ï±ï¿½
             Update(N + C);
           }
         }
         break;
       }
       case 3: { // Change
-        Splay(N + B);   // ×ªµ½¸ùÉÏ 
-        N[B].Value = C; // ¸ÄÈ¨Öµ 
+        Splay(N + B);   // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+        N[B].Value = C; // ï¿½ï¿½È¨Öµ 
         break;
       }
     }

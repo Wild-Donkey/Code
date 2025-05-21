@@ -22,69 +22,50 @@ inline unsigned RD() {
   }
   return intmp;
 }
-inline int RDsg() {
-  int rdtp(0), rdsg(1);
-  char rdch(getchar());
-  while ((rdch < '0' || rdch > '9') && (rdch != '-')) {
-    rdch = getchar();
-  }
-  if (rdch == '-') {
-    rdsg = -1;
-    rdch = getchar();
-  }
-  while (rdch >= '0' && rdch <= '9') {
-    rdtp = rdtp * 10 + rdch - '0';
-    rdch = getchar();
-  }
-  return rdtp * rdsg;
-}
-unsigned m, n, Cnt(0), A, B, C, t, Ans(0), Fa[150050];
-inline unsigned Find (unsigned x) {
+unsigned m, n, Cnt(0), A, B, C, D, t, Ans(0), Fa[150050];
+unsigned Stack[150050], * Top(Stack);
+inline unsigned Find(unsigned x) {
   register unsigned now(x);
-  while (Fa[now] ^ now) now = Fa[now];
-  return Fa[x] = now; // 路径压缩 
+  while (Fa[now] ^ now) *(++Top) = now, now = Fa[now];
+  while (Top > Stack) Fa[*(Top--)] = now;
+  return now;
 }
 int main() {
   n = RD(), m = RD();
-  t = n * 3 + 3;  // 总点数 
-  for (register unsigned i(1); i <= t; ++i) { // 初始化 
-    Fa[i] = i;
-  }
+  t = n * 3 + 3;  // 锟杰碉拷锟斤拷 
+  for (register unsigned i(1); i <= t; ++i) Fa[i] = i;
   for (register unsigned i(1); i <= m; ++i) {
-    if(RD() & 1) {
-      A = RD(), B = RD();
-      if(A > n || B > n) {
-        ++Ans;
-        continue;
-      }
-      if(A == B) {
-        continue;
-      }
+    D = RD(), A = RD(), B = RD();
+    if (A > n || B > n) {
+      ++Ans;
+      continue;
+    }
+    if (D & 1) {//A same B
+      if (A == B) continue;
       C = Find(A * 3);
-      if (C == Find((B * 3) + 1) || C == Find((B * 3) + 2)) { // A eat B or B eat A 关系错乱 
+      if (C == Find((B * 3) + 1) || C == Find((B * 3) + 2)) {
         ++Ans;
         continue;
       }
-      if (C ^ Find(B * 3)) {  // 建立关系 
-        Fa[C] = Fa[B * 3];                      // 我的同类的同类是我自己, 将 A 的第一个点和 B 的第一个点合并
-        Fa[Find((A * 3) + 1)] = Fa[(B * 3) + 1];// 我的同类的天敌是我的天敌, 将 A 的第二个点和 B 的第二个点合并 
-        Fa[Find((A * 3) + 2)] = Fa[(B * 3) + 2];// 我的同类的食物是我的食物, 将 A 的第三个点和 B 的第三个点合并 
+      if (C ^ Find(B * 3)) {
+        Fa[C] = Fa[B * 3];
+        Fa[Find((A * 3) + 1)] = Fa[(B * 3) + 1];
+        Fa[Find((A * 3) + 2)] = Fa[(B * 3) + 2];
       }
-    } else {
-      A = RD(), B = RD();
-      if(A == B || A > n || B > n) {  // 我吃我自己或超出范围
+    } else {// A eat B
+      if (A == B) {
         ++Ans;
         continue;
       }
       C = Find(A * 3);
-      if (C == Find(B * 3) || C == Find((B * 3) + 2)) { // A 是 B 的同类或食物, 关系错乱 
+      if (C == Find(B * 3) || C == Find((B * 3) + 2)) {
         ++Ans;
         continue;
       }
-      if (C ^ Find((B * 3) + 1)) {  // 建立关系 
-        Fa[C] = Fa[(B * 3) + 1];                // 我的食物的天敌是我自己, 将 A 的第一个点和 B 的第二个点合并
-        Fa[Find((A * 3) + 2)] = Fa[B * 3];      // 我的食物的同类是我的食物, 将 A 的第三个点和 B 的第一个点合并
-        Fa[Find((A * 3) + 1)] = Fa[(B * 3) + 2];// 我的食物的食物是我的天敌, 将 A 的第二个点和 B 的第三个点合并
+      if (C ^ Find((B * 3) + 1)) {
+        Fa[C] = Fa[(B * 3) + 1];
+        Fa[Find((A * 3) + 2)] = Fa[B * 3];
+        Fa[Find((A * 3) + 1)] = Fa[(B * 3) + 2];
       }
     }
   }

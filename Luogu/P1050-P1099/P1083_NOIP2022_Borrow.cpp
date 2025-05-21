@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,35 +33,47 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
-unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+unsigned a[1000005], m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Order {
+  unsigned l, r, v;
+} b[1000005];
+long long Div[1000005];
+char Judge(unsigned x) {
+  for (unsigned i(1); i <= n; ++i) Div[i] = 0;
+  for (unsigned i(1); i <= x; ++i)
+    Div[b[i].l] += b[i].v, Div[b[i].r + 1] -= b[i].v;
+  for (unsigned i(1); i <= n; ++i) {
+    Div[i] += Div[i - 1];
+    if (Div[i] > a[i]) return 0;
+  }
+  return 1;
 }
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
   //  t = RD();
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
-    }
+  n = RD(), m = RD();
+  for (unsigned i(1); i <= n; ++i) a[i] = RD();
+  for (unsigned i(1); i <= m; ++i)
+    A = RD(), B = RD(), C = RD(), b[i] = {B, C, A};
+  unsigned L(0), R(m), Mid;
+  while (L < R) {
+    Mid = ((L + R + 1) >> 1);
+    if (Judge(Mid))
+      L = Mid;
+    else
+      R = Mid - 1;
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
+  if (L == m)
+    printf("0\n");
+  else
+    printf("-1\n%u\n", L + 1);
   //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,35 +33,46 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
-unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+unsigned a[100005], b[100005], m, n;
+int Cur[100005];
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+inline void Clr() { n = RD(); }
+char Judge(unsigned x) {
+  int Mn(0);
+  Cur[0] = 0;
+  Cur[1] = (a[1] < x) ? -1 : 1;
+  for (unsigned i(2); i <= n; ++i) {
+    Mn = min(Cur[i - 2], Mn);
+    if (a[i] < x)
+      Cur[i] = Cur[i - 1] - 1;
+    else
+      Cur[i] = Cur[i - 1] + 1;
+    if (Cur[i] > Mn) return 1;
+  }
+  return 0;
 }
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
+  t = RD();
+  for (unsigned T(1); T <= t; ++T) {
+    Clr();
+    for (unsigned i(1); i <= n; ++i) { b[i] = a[i] = RD(); }
+    sort(b + 1, b + n + 1);
+    m = unique(b + 1, b + n + 1) - b - 1;
+    for (unsigned i(1); i <= n; ++i)
+      a[i] = lower_bound(b + 1, b + m + 1, a[i]) - b;
+    unsigned L(1), R(m), Mid;
+    while (L < R) {
+      Mid = ((L + R + 1) >> 1);
+      if (Judge(Mid))
+        L = Mid;
+      else
+        R = Mid - 1;
     }
+    printf("%u\n", b[L]);
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
-  //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

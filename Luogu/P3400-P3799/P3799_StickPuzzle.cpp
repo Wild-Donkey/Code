@@ -31,16 +31,14 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
-unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+const unsigned long long Mod(1000000007);
+unsigned Cnt[5005], m, n;
+unsigned A, B, C, D, t;
+unsigned long long Ans(0), Sum(0);
+unsigned long long Bnm(unsigned long long x) {
+  return ((x * (x - 1)) >> 1) % Mod;
 }
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
@@ -48,18 +46,16 @@ signed main() {
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
-    }
+  for (unsigned i(1); i <= n; ++i) ++Cnt[RD()];
+  for (unsigned i(1); i <= 5000; ++i) {
+    Sum = 0;
+    if (!(i & 1)) Sum = Bnm(Cnt[i >> 1]);
+    for (unsigned j((i - 1) >> 1); j; --j)
+      Sum = (Sum + (unsigned long long)Cnt[j] * Cnt[i - j]) % Mod;
+    Ans = (Ans + Bnm(Cnt[i]) * Sum) % Mod;
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
+  printf("%llu\n", Ans);
   //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

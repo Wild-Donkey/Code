@@ -13,9 +13,11 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
-inline unsigned RD() {
-  unsigned intmp(0);
+inline unsigned long long RD() {
+  unsigned long long intmp(0);
   char rdch(getchar());
   while (rdch < '0' || rdch > '9') rdch = getchar();
   while (rdch >= '0' && rdch <= '9')
@@ -31,35 +33,31 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
+const unsigned long long INF(0x7f7f7f7f7f7f7f7f);
 unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
-}
+unsigned long long Ans(0), Cur(0), Tmp(0);
+priority_queue<pair<unsigned long long, unsigned long long> > Q;
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
   //  t = RD();
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
-    }
+  n = RD(), m = RD();
+  for (unsigned i(1); i <= n; ++i) Q.push({INF - RD(), INF});
+  if (m ^ 2)
+    while (n % (m - 1) != 1) Q.push({INF, INF}), ++n;
+  // printf("%u\n", n);
+  for (int i(n); i >= m; i -= (m - 1)) {
+    Tmp = INF, Cur = 0;
+    // printf("i = %u Ans %llu\n", i, Ans);
+    for (unsigned j(m); j; --j)
+      Cur += INF - Q.top().first, Tmp = min(Tmp, Q.top().second), Q.pop();
+    Q.push({INF - Cur, Tmp - 1}), Ans += Cur;
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
+  printf("%llu\n%llu\n", Ans, INF - Q.top().second);
   //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

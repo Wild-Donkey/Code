@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,35 +33,37 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
-unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+unsigned a[105], m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+char Flg(0);
+inline void Clr() {
+  n = RD();
+  Flg = 0;
 }
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
+  t = RD();
+  for (unsigned T(1); T <= t; ++T) {
+    Clr();
+    for (unsigned i(1); i <= n; ++i) { a[n + i] = a[i] = RD(); }
+    a[0] = 0, m = 1;
+    for (unsigned i(1); i <= n + n - 1; ++i) {
+      if (a[i] < a[i - 1]) {
+        m = i;
+        continue;
+      }
+      if (i - m + 1 >= n) {
+        Flg = 1;
+        break;
       }
     }
+    if (Flg)
+      printf("Yes\n");
+    else
+      printf("No\n");
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
-  //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,16 +33,41 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
 unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
-}
+unsigned A, B, C, D, t;
+unsigned long long Tmp(0), Cur(0);
+char a[500005];
+struct Node;
+Node *Stack[500005], **Top(Stack);
+struct Node {
+  char Type;
+  Node *Fa, *Pre;
+  vector<Node *> Son;
+  unsigned Cnt;
+  unsigned long long Ans;
+  void DFS() {
+    if (Type) {
+      if (Top > Stack) {
+        Pre = *(Top--);
+        if (Pre->Fa && Pre->Fa->Type)
+          Cnt = Pre->Fa->Cnt + 1;
+        else
+          Cnt = 1;
+        Cur += Cnt;
+      } else
+        Pre = NULL, Cnt = 0;
+    } else
+      *(++Top) = this;
+    Ans = Cur;
+    for (auto i : Son) i->DFS();
+    if (Type) {
+      if (Pre) *(++Top) = Pre;
+      Cur -= Cnt;
+    } else
+      --Top;
+  }
+} N[500005];
+//  inline void Clr() {}
 signed main() {
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
@@ -48,18 +75,13 @@ signed main() {
   //  for (unsigned T(1); T <= t; ++T){
   //  Clr();
   n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
-    }
-  }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
+  scanf("%s\n", a + 1);
+  for (unsigned i(1); i <= n; ++i) N[i].Type = a[i] == ')';
+  for (unsigned i(2); i <= n; ++i) (N[i].Fa = N + RD())->Son.push_back(N + i);
+  N[1].DFS();
+  for (unsigned i(1); i <= n; ++i) Tmp ^= i * N[i].Ans;
+  printf("%llu\n", Tmp);
   //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }

@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #define Wild_Donkey 0
+#define foreplay for
+#define wild while
 using namespace std;
 inline unsigned RD() {
   unsigned intmp(0);
@@ -31,35 +33,43 @@ inline int RDsg() {
     rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
   return rdtp * rdsg;
 }
-unsigned f[33][33], Choi[33][33], Tmp;
+char a[10000005];
+unsigned Sum[10000005], List[256];
+pair<unsigned, unsigned> Q[10005];
 unsigned m, n;
-unsigned Cnt(0), Ans(0);
-inline void DFS(unsigned x, unsigned y) {
-  if (y < 1) return;
-  printf("%u ", Choi[x][y]);
-  unsigned A(Choi[x][y] - x);
-  DFS(x, A);
-  DFS(Choi[x][y] + 1, y - A - 1);
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+inline void Clr() {
+  memset(a, 0, n);
+  scanf("%s", a);
+  n = strlen(a);
 }
 signed main() {
+  List['P'] = 3, List['p'] = 2, List['G'] = 1;
   //  freopen(".in", "r", stdin);
   //  freopen(".out", "w", stdout);
-  //  t = RD();
-  //  for (unsigned T(1); T <= t; ++T){
-  //  Clr();
-  n = RD();
-  for (unsigned i(1); i <= n; ++i) f[i][1] = RD(), Choi[i][1] = i, f[i][0] = 1;
-  for (unsigned Len(2); Len <= n; ++Len) {
-    for (unsigned i(n - Len + 1); i; --i) {
-      for (unsigned len(Len - 1); ~len; --len) {
-        Tmp = f[i][len] * f[i + len + 1][Len - len - 1] + f[i + len][1];
-        if (f[i][Len] < Tmp) { f[i][Len] = Tmp, Choi[i][Len] = i + len; }
-      }
+  t = RD();
+  for (unsigned T(1); T <= t; ++T) {
+    Clr();
+    Sum[0] = List[a[0]];
+    for (unsigned i(1); i < n; ++i) Sum[i] = Sum[i - 1] + List[a[i]];
+    m = RD();
+    for (unsigned i(1); i <= m; ++i) {
+      A = RD() - 1, B = RD() - 1;
+      printf("%u\n", Sum[B] - (A ? Sum[A - 1] : 0));
     }
   }
-  printf("%u\n", f[1][n]);
-  DFS(1, n);
-  //  }
-  // system("pause");
+  //  system("pause");
   return Wild_Donkey;
 }
+/*
+Tears snaking down your skin
+Do you feel lonely
+Do you feel blue
+All right too
+
+Leaves dancing in the wind
+Do you feel angry
+Do you feel hunbry
+All right too
+*/
